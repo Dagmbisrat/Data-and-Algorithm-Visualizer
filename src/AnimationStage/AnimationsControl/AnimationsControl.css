@@ -1,0 +1,5 @@
+.DefaultCanvas {
+    background: gray;
+    overflow: hidden;
+    /* display: flex; */
+}

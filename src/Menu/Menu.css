@@ -1,0 +1,56 @@
+.expandable-container {
+    height: 100vh;
+    position: static;
+    left: 0;
+    bottom: 0;
+    right: auto;
+    background-color: #413f3f;
+    overflow: hidden;
+    display: flex;
+}
+
+.resize {
+    width: 2px;
+    background: black;
+    /* display: flex; */
+    /* align-items: center; */
+    cursor: col-resize;
+}
+.dropdown-menu {
+    background-color: #413f3f;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.menu-item {
+    overflow: hidden; /* Hide overflowing content */
+    border-bottom: 1px solid #444;
+}
+
+.menu-title {
+    overflow: hidden; /* Hide overflowing content */
+    padding: 10px;
+    cursor: pointer;
+}
+
+.menu-title:hover {
+    background-color: #444;
+}
+
+.submenu {
+    background-color: #444;
+}
+
+.submenu-item {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.submenu-item:hover {
+    background-color: #555;
+}
+.extra {
+    overflow: hidden; /* Hide overflowing content */
+    height: 100vh;
+    bottom: 0;
+}
