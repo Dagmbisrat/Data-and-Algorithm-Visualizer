@@ -10,6 +10,7 @@ const StacksAnimations = ({
   Clear,
   Input,
   menuWidth,
+  Log,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -48,27 +49,32 @@ const StacksAnimations = ({
   //pushes an element to the stack
   const pushElement = (element) => {
     if (stack.length >= 20) {
-      console.error("Stack overflow: Max 20");
+      //console.error("Stack overflow: Max 20");
+      Log("Stack overflow: Max 20");
       return;
     }
     setStack([...stack, element]);
+    Log("Pushed " + Input);
   };
 
   //pop's the stack
   const popElement = () => {
     if (stack.length === 0) {
-      console.log("Stack is empty!");
+      // console.error("Stack is empty!");
+      Log("Stack underflow:  Empty Stack!");
       return false;
     }
 
     const newStack = stack.slice(0, -1);
     setStack(newStack);
+    Log("Poped");
     return true;
   };
 
   //clears the stack
   const clearStack = () => {
     setStack([]);
+    Log("Cleared");
   };
 
   // chages the windowWidth when window width changes
@@ -81,7 +87,7 @@ const StacksAnimations = ({
 
     // Clean up the event listener on component unmount
     return () => {
-      console.log("resized");
+      // console.log("resized");
       window.removeEventListener("resize", handleResize);
     };
   }, []);
@@ -115,8 +121,8 @@ const StacksAnimations = ({
     }
   };
   const drawTopBox = (canvas, context) => {
-    const startx = canvas.width / 2 - 273;
-    const starty = canvas.height / 2 - 200;
+    const startx = canvas.width - canvas.width * 0.9; // make the array in the middle of the canvas
+    const starty = canvas.height - canvas.height * 0.9;
 
     // Draw the box
     context.strokeStyle = "white"; // Use the boxColor prop
@@ -136,7 +142,7 @@ const StacksAnimations = ({
   //when Push is pressed
   useEffect(() => {
     if (isMounted.current) {
-      Input == "" ? console.log("Input empty") : pushElement(Input);
+      Input == "" ? Log("Input empty") : pushElement(Input);
     }
   }, [Push]);
 

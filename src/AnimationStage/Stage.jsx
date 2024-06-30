@@ -12,6 +12,7 @@ function Stage({ Animation_name, menuWidth }) {
   const [doRemove, setDoRemove] = useState(false);
   const [doClear, setDoClear] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [loggedMessage, setloggedMessage] = useState("");
 
   const handleMouseDown = (event) => {
     setMouseDown(true);
@@ -37,16 +38,19 @@ function Stage({ Animation_name, menuWidth }) {
     //console.log("Input: " + input); //testing
   };
   const clear = () => {
-    console.log("cleared"); //for testing
+    //console.log("cleared"); //for testing
     setDoClear(!doClear);
   };
   const remove = () => {
-    console.log("removed"); //for testing
+    //console.log("removed"); //for testing
     setDoRemove(!doRemove);
   };
   const add = () => {
-    console.log("added"); //for testing
+    //console.log("added"); //for testing
     setDoAdd(!doAdd);
+  };
+  const log = (message) => {
+    setloggedMessage(message);
   };
 
   return (
@@ -57,7 +61,6 @@ function Stage({ Animation_name, menuWidth }) {
     >
       <div className="alg-window" style={{ height: hight }}>
         <div className="Animation-canvas" style={{ height: hight }}>
-          {/* {Animation_name} */}
           <Animations
             Animation_name={Animation_name}
             menuWidth={menuWidth}
@@ -67,6 +70,7 @@ function Stage({ Animation_name, menuWidth }) {
             Add={doAdd}
             Clear={doClear}
             Input={inputValue}
+            Log={log}
           />
         </div>
         <div className="resize-bar" onMouseDown={handleMouseDown}></div>
@@ -75,11 +79,12 @@ function Stage({ Animation_name, menuWidth }) {
         Animation_name={Animation_name}
         updateSpeed={updateSpeed}
         speed={speed}
-        Pop={remove}
-        Push={add}
+        Remove={remove}
+        Add={add}
         Clear={clear}
         Input={inputValue}
         updateInput={updateInput_}
+        LoggedMessage={loggedMessage}
       />
     </div>
   );

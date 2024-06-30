@@ -3,6 +3,8 @@ import "./AnimationsControl.css";
 import PropTypes from "prop-types";
 import StacksAnimations from "./AllAnimations/SimpleDataTypes/StacksAnimation.jsx";
 import QueuesAnimation from "./AllAnimations/SimpleDataTypes/QueuesAnimation.jsx";
+import StackslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Stacks-linkedListAnimation.jsx";
+import QueueslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Queues-linkedListAnimation.jsx";
 
 const Animations = ({
   Animation_name,
@@ -13,6 +15,7 @@ const Animations = ({
   Clear,
   Input,
   menuWidth,
+  Log,
 }) => {
   const canvasRef = useRef(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -49,6 +52,21 @@ const Animations = ({
           Clear={Clear}
           Input={Input}
           menuWidth={menuWidth}
+          Log={Log}
+        />
+      );
+
+    case "Stacks-linkedList":
+      return (
+        <StackslinkedListAnimations
+          speed={speed}
+          height={height}
+          Push={Add}
+          Pop={Remove}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
         />
       );
 
@@ -62,6 +80,21 @@ const Animations = ({
           Clear={Clear}
           Input={Input}
           menuWidth={menuWidth}
+          Log={Log}
+        />
+      );
+
+    case "Queues-linkedList":
+      return (
+        <QueueslinkedListAnimations
+          speed={speed}
+          height={height}
+          Queue={Add}
+          UnQueue={Remove}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
         />
       );
 

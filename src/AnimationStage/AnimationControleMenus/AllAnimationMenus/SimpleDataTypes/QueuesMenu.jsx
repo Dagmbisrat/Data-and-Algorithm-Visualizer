@@ -32,8 +32,8 @@ function QueuesMenu({
           value={Input}
           onChange={handleInputChange}
         />
-        <button onClick={Queue}> Queue </button>
-        <button onClick={UnQueue}> UnQueue </button>
+        <button onClick={Queue}> Enqueue </button>
+        <button onClick={UnQueue}> Dequeue </button>
         <button onClick={Clear}> Clear</button>
         <div className="slidecontainer">
           {/* <p>Speed</p> */}

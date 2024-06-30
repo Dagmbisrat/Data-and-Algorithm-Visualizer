@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from "react";
-import "./StacksAnimation.css";
+import "./QueuesAnimation.css";
 import PropTypes from "prop-types";
 
 const QueuesAnimation = ({
@@ -10,6 +10,7 @@ const QueuesAnimation = ({
   Clear,
   Input,
   menuWidth,
+  Log,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -37,6 +38,7 @@ const QueuesAnimation = ({
     }
     return head + 1;
   };
+
   //for any annimation needs
   class Obj {
     constructor(position) {
@@ -63,37 +65,41 @@ const QueuesAnimation = ({
   const queueElement = (element) => {
     //Cheaks if Queueing an elament will result in a ovverride
     if (nextTail() == head) {
-      console.error("Queue overflow: Max 20");
+      Log("Queue overflow: Max 20");
       return;
     }
     const newArray = [...queue];
 
-    // Change the specified index to 0
+    // Add the specified element to the tail index then update the tail
     newArray[tail] = element;
     setQueue(newArray);
     setTail(nextTail);
+    Log("Enqueued " + Input);
   };
 
   //unQueue the stack
   const unQueue = () => {
     //Checks if the Head will overtake the Tail
     if (nextHead() == nextTail()) {
-      console.error("Queue overflow: Max 20");
+      Log("Queue underflow: Empty Queue!");
       return;
     }
     const newArray = [...queue];
 
-    // Change the specified index to 0
+    // Change the removed element at the head to Null then update the Head index
     newArray[head] = "null";
     setQueue(newArray);
     setHead(nextHead);
+    Log("Dequeued");
   };
 
   //clears the stack
   const clear = () => {
+    //resets array, Head, and Tail
     setQueue(Array(20).fill("null"));
     setHead(0);
     setTail(0);
+    Log("Cleared!");
   };
 
   // chages the windowWidth when window width changes
@@ -106,7 +112,7 @@ const QueuesAnimation = ({
 
     // Clean up the event listener on component unmount
     return () => {
-      console.log("resized");
+      // console.log("resized");
       window.removeEventListener("resize", handleResize);
     };
   }, []);
@@ -140,8 +146,8 @@ const QueuesAnimation = ({
   };
 
   const drawTailandHead = (canvas, context) => {
-    const startx = canvas.width / 2 - 273;
-    const starty = canvas.height / 2 - 200;
+    const startx = canvas.width - canvas.width * 0.95; // make the array in the middle of the canvas
+    const starty = canvas.height - canvas.height * 0.9;
 
     for (let i = 0; i < 2; i++) {
       const x = startx + (i % boxesPerRow) * (boxWidth + gap);
@@ -170,7 +176,7 @@ const QueuesAnimation = ({
   //when Push is pressed
   useEffect(() => {
     if (isMounted.current) {
-      Input == "" ? console.log("Input empty") : queueElement(Input);
+      Input == "" ? Log("Input empty") : queueElement(Input);
     }
   }, [Queue]);
 

@@ -7,3 +7,16 @@
     border-bottom: 1px solid #000; /* Change color and thickness as needed */
     padding-bottom: 2px; /* Adjust padding to fit the content */
 }
+.Console-Text {
+    background-color: #272525;
+    /* font-family: "Times New Roman", Times, serif; */
+    font-size: 14px;
+    height: 100%;
+    overflow-y: auto;
+}
+.list {
+    display: flex;
+    flex-direction: column; /* Ensure vertical alignment */
+    list-style: "";
+    padding: 10px;
+}
