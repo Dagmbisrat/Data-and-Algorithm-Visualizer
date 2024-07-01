@@ -22,6 +22,7 @@ header {
     background-color: #413f3f; /* You can change the background color as needed */
     border: 1px #696969; /* Add border for outline */
     align-items: center;
+    color: white;
 }
 .tittle-button:hover {
     color: #616161;
