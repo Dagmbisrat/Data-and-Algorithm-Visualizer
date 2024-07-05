@@ -25,27 +25,6 @@ const StacksAnimations = ({
   const dataOffsetX = 20;
   const dataOffsetY = 30;
 
-  class Obj {
-    constructor(position) {
-      this.postion = position;
-    }
-
-    draw(context) {
-      context.beginPath();
-      context.arc(this.postion.x, this.postion.y, 50, 0, 2 * Math.PI);
-      context.fillStyle = "red";
-      context.fill();
-      context.stroke();
-    }
-
-    moveDown(num) {
-      this.postion.y = this.postion.y + num;
-    }
-    moveRight(num) {
-      this.postion.x = this.postion.x + num;
-    }
-  }
-
   //pushes an element to the stack
   const pushElement = (element) => {
     if (stack.length >= 20) {
@@ -160,6 +139,7 @@ const StacksAnimations = ({
     }
   }, [Clear]);
 
+  //Updates Is mounted when after compleation of mountings
   useEffect(() => {
     isMounted.current = true;
     return () => {
@@ -179,6 +159,7 @@ const StacksAnimations = ({
       drawTopBox(canvas, context);
     }
   }, [height, windowWidth, menuWidth, stack]);
+
   return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
 };
 export default StacksAnimations;

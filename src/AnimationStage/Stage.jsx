@@ -13,6 +13,8 @@ function Stage({ Animation_name, menuWidth }) {
   const [doClear, setDoClear] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [loggedMessage, setloggedMessage] = useState("");
+  const [doSort, setDoSort] = useState(false);
+  const [doRandom, setDoRandom] = useState(false);
 
   const handleMouseDown = (event) => {
     setMouseDown(true);
@@ -46,8 +48,14 @@ function Stage({ Animation_name, menuWidth }) {
     setDoRemove(!doRemove);
   };
   const add = () => {
-    //console.log("added"); //for testing
+    // console.log("added"); //for testing
     setDoAdd(!doAdd);
+  };
+  const sort = () => {
+    setDoSort(!doSort);
+  };
+  const random = () => {
+    setDoRandom(!doRandom);
   };
   const log = (message) => {
     setloggedMessage(message);
@@ -71,6 +79,8 @@ function Stage({ Animation_name, menuWidth }) {
             Clear={doClear}
             Input={inputValue}
             Log={log}
+            Random={doRandom}
+            Sort={doSort}
           />
         </div>
         <div className="resize-bar" onMouseDown={handleMouseDown}></div>
@@ -79,12 +89,14 @@ function Stage({ Animation_name, menuWidth }) {
         Animation_name={Animation_name}
         updateSpeed={updateSpeed}
         speed={speed}
-        Remove={remove}
         Add={add}
+        Remove={remove}
         Clear={clear}
         Input={inputValue}
         updateInput={updateInput_}
         LoggedMessage={loggedMessage}
+        Sort={sort}
+        Random={random}
       />
     </div>
   );

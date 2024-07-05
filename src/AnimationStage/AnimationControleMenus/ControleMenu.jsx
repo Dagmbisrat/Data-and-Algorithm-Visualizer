@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React, { useState, useEffect, useRef } from "react";
 import StacksMenu from "./AllAnimationMenus/SimpleDataTypes/StacksMenu.jsx";
 import QueuesMenu from "./AllAnimationMenus/SimpleDataTypes/QueuesMenu.jsx";
+import SortingMenu from "./AllAnimationMenus/Sorting/SortingMenu.jsx";
 
 function ControleMenu({
   Animation_name,
@@ -14,6 +15,8 @@ function ControleMenu({
   Input,
   updateInput,
   LoggedMessage,
+  Sort,
+  Random,
 }) {
   const isMounted = useRef(false);
   const updateSpeed_ = (num) => {
@@ -30,6 +33,7 @@ function ControleMenu({
   const [queuesConsoleOuput, setQueuesConsoleOuput] = useState([]);
   const [queueslinkedListConsoleOuput, setQueueslinkedListConsoleOuput] =
     useState([]);
+  const [bubbleSortConsoleOuput, setBubbleSortConsoleOuput] = useState([]);
 
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
@@ -37,6 +41,7 @@ function ControleMenu({
     setStacksLinkedListConsoleOuput([]);
     setQueuesConsoleOuput([]);
     setQueueslinkedListConsoleOuput([]);
+    setBubbleSortConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
@@ -58,6 +63,11 @@ function ControleMenu({
         case "Queues-linkedList":
           setQueueslinkedListConsoleOuput([
             ...queueslinkedListConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "Bubble sort":
+          setBubbleSortConsoleOuput([
+            ...bubbleSortConsoleOuput,
             " > " + LoggedMessage,
           ]);
       }
@@ -153,6 +163,30 @@ function ControleMenu({
           <div className="Console-Text">
             <ul className="list">
               {queueslinkedListConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Bubble sort":
+      return (
+        <>
+          <SortingMenu
+            Add={Add}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Random={Random}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {bubbleSortConsoleOuput.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>

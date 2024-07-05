@@ -1,0 +1,13 @@
+.Menubackground {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 2px; /* Adjust padding to fit the content */
+    border-bottom: 1px solid #000; /* Change color and thickness as needed */
+}
+.input {
+    font-family: Arial, sans-serif;
+    width: 45px;
+    margin: 20px;
+    text-align: center;
+}

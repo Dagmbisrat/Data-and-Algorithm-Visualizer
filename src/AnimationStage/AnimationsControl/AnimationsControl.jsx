@@ -5,6 +5,7 @@ import StacksAnimations from "./AllAnimations/SimpleDataTypes/StacksAnimation.js
 import QueuesAnimation from "./AllAnimations/SimpleDataTypes/QueuesAnimation.jsx";
 import StackslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Stacks-linkedListAnimation.jsx";
 import QueueslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Queues-linkedListAnimation.jsx";
+import BubbleSortAnimations from "./AllAnimations/Sorting/BubbleSortAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -16,6 +17,8 @@ const Animations = ({
   Input,
   menuWidth,
   Log,
+  Random,
+  Sort,
 }) => {
   const canvasRef = useRef(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -95,6 +98,21 @@ const Animations = ({
           Input={Input}
           menuWidth={menuWidth}
           Log={Log}
+        />
+      );
+
+    case "Bubble sort":
+      return (
+        <BubbleSortAnimations
+          speed={speed}
+          height={height}
+          Add={Add}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Sort={Sort}
         />
       );
 
