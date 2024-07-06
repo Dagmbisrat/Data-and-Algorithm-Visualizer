@@ -110,7 +110,6 @@ const StacksAnimations = ({
     // Draw the index number
     context.fillStyle = "white";
     context.font = "16px Arial";
-
     context.fillText("Top", startx + 13, starty + textOffsetY);
 
     // Draw the index number

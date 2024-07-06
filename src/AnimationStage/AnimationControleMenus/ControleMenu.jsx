@@ -34,6 +34,9 @@ function ControleMenu({
   const [queueslinkedListConsoleOuput, setQueueslinkedListConsoleOuput] =
     useState([]);
   const [bubbleSortConsoleOuput, setBubbleSortConsoleOuput] = useState([]);
+  const [insertionSortConsoleOuput, setInsertionSortConsoleOuput] = useState(
+    [],
+  );
 
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
@@ -42,6 +45,7 @@ function ControleMenu({
     setQueuesConsoleOuput([]);
     setQueueslinkedListConsoleOuput([]);
     setBubbleSortConsoleOuput([]);
+    setInsertionSortConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
@@ -65,9 +69,14 @@ function ControleMenu({
             ...queueslinkedListConsoleOuput,
             " > " + LoggedMessage,
           ]);
-        case "Bubble sort":
+        case "Bubble Sort":
           setBubbleSortConsoleOuput([
             ...bubbleSortConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "Insertion Sort":
+          setInsertionSortConsoleOuput([
+            ...insertionSortConsoleOuput,
             " > " + LoggedMessage,
           ]);
       }
@@ -170,7 +179,7 @@ function ControleMenu({
         </>
       );
 
-    case "Bubble sort":
+    case "Bubble Sort":
       return (
         <>
           <SortingMenu
@@ -187,6 +196,30 @@ function ControleMenu({
           <div className="Console-Text">
             <ul className="list">
               {bubbleSortConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Insertion Sort":
+      return (
+        <>
+          <SortingMenu
+            Add={Add}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Random={Random}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {insertionSortConsoleOuput.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>

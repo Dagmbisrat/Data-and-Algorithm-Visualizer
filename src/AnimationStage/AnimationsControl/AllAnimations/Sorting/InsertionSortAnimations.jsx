@@ -1,8 +1,7 @@
 import { useRef, useEffect, useState } from "react";
-import "./BubbleSortAnimations.css";
 import PropTypes from "prop-types";
 
-const BubbleSortAnimations = ({
+const InsertionSortAnimations = ({
   speed,
   height,
   Add,
@@ -18,13 +17,13 @@ const BubbleSortAnimations = ({
   const [isAnimating, setisAnimating] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [arr, setArr] = useState([]);
-  const minBoxHight = 0.1; //the minimum box hight (as a percentage of tecanvas hight)
-  const maxBoxHight = 0.8; //the Max box hight (as a percentage of the canvas hight)
   const maxArrsize = 15;
   const boxWidth = 45;
+  const keyBoxLengthAndWidth = 50;
+  const space = 20;
   const maxInt = 50;
   const minInt = -50;
-  const maxFrames = 55;
+  const maxFrames = 60;
   const normalColor = "gray";
   const hilightedColor = "red";
 
@@ -32,6 +31,7 @@ const BubbleSortAnimations = ({
   class Box {
     constructor(value) {
       this.value = value;
+      this.sorted = false;
     }
     setX(x) {
       this.x = x;
@@ -42,7 +42,9 @@ const BubbleSortAnimations = ({
     moveX(value) {
       this.x = this.x + value;
     }
-
+    moveY(value) {
+      this.y = this.y + value;
+    }
     setSorted() {
       this.sorted = true;
     }
@@ -62,10 +64,32 @@ const BubbleSortAnimations = ({
       context.font = "14px Arial";
       context.fillText(this.value, this.x + 20, this.y + 20);
     }
+
+    drawAsKey(canvas, context, color) {
+      const x = canvas.width - (keyBoxLengthAndWidth + space);
+      const y = space;
+      //draw the box filled
+      context.fillStyle = color;
+      context.fillRect(x, y, keyBoxLengthAndWidth, keyBoxLengthAndWidth);
+
+      //draw the outline
+      context.strokeStyle = "white"; // Use the boxColor prop
+      context.strokeRect(x, y, keyBoxLengthAndWidth, keyBoxLengthAndWidth);
+
+      //Draw the index number
+      context.fillStyle = "white";
+      context.font = "14px Arial";
+      context.fillText(this.value, x + 13, y + 30);
+
+      //Draw the Key tag
+      context.fillStyle = "white";
+      context.font = "16px Arial";
+      context.fillText("Key", x + 9, y + (keyBoxLengthAndWidth + space));
+    }
   }
 
   //Animates comparing two box's
-  function animateCompare(box1, box2) {
+  function wait(key) {
     return new Promise((resolve) => {
       const canvas = canvasRef.current;
       const context = canvasRef.current.getContext("2d");
@@ -78,9 +102,9 @@ const BubbleSortAnimations = ({
 
         //display the array
         for (const box of arr) {
-          //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          if (box.equals(box1) || box.equals(box2)) {
-            box.draw(canvas, context, hilightedColor);
+          //cheak if the box is the key
+          if (box.equals(key)) {
+            box.drawAsKey(canvas, context, hilightedColor);
           } else {
             box.draw(canvas, context, normalColor);
           }
@@ -93,13 +117,12 @@ const BubbleSortAnimations = ({
         if (frameCounter < maxFrames - speed / 2) {
           // Request the next frame
           requestAnimationFrame(drawFrame);
-          //console.log("frame played");
         } else {
           // Reset the frame counter and stop the animation
           for (const box of arr) {
             box.draw(canvas, context, normalColor);
           }
-          //console.log("Animation complete");
+
           resolve();
         }
       }
@@ -107,8 +130,9 @@ const BubbleSortAnimations = ({
       drawFrame();
     });
   }
+
   //Animate the Swap
-  function animateSwap(box1, box2) {
+  function animateSwap(box1, box2, key) {
     return new Promise((resolve) => {
       const canvas = canvasRef.current;
       const context = canvasRef.current.getContext("2d");
@@ -130,18 +154,27 @@ const BubbleSortAnimations = ({
           box2.moveX(incramentValue);
         } else {
           //move box2 left and box1 right
-
           box1.moveX(incramentValue);
           box2.moveX(-incramentValue);
         }
 
         //display the array
         for (const box of arr) {
-          //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          box.draw(canvas, context, normalColor);
+          //first check if its the key
+          //if yes then draw as key only
+          if (box.equals(key)) {
+            box.drawAsKey(canvas, context, hilightedColor);
+          } else {
+            //if not check if its box1 or box2
+            //if then draw with highlited colors
+            if (box.equals(box1) || box.equals(box2)) {
+              box.draw(canvas, context, hilightedColor);
+            } else {
+              //if not then just draw normally
+              box.draw(canvas, context, normalColor);
+            }
+          }
         }
-        box1.draw(canvas, context, hilightedColor);
-        box2.draw(canvas, context, hilightedColor);
 
         //incrament the frame counter
         frameCounter++;
@@ -154,9 +187,13 @@ const BubbleSortAnimations = ({
         } else {
           // Reset the frame counter and stop the animation
           for (const box of arr) {
-            box.draw(canvas, context, normalColor);
+            if (box.equals(key)) {
+              box.drawAsKey(canvas, context, hilightedColor);
+            } else {
+              box.draw(canvas, context, normalColor);
+            }
           }
-          //console.log("swap complete");
+
           resolve();
         }
       }
@@ -164,34 +201,189 @@ const BubbleSortAnimations = ({
     });
   }
 
-  async function play() {
-    let n = arr.length;
-    for (let i = 0; i < n - 1; i++) {
-      let swapped = false;
-      for (let j = 0; j < n - 1 - i; j++) {
-        //play the animation that compare
-        await animateCompare(arr[j], arr[j + 1]);
-        if (arr[j].value > arr[j + 1].value) {
-          //play the swap animation and swap elements
-          await animateSwap(arr[j], arr[j + 1]);
-          let tmpArr = arr;
-          let temp = tmpArr[j];
-          tmpArr[j] = tmpArr[j + 1];
-          tmpArr[j + 1] = temp;
-          setArr(tmpArr);
-          swapped = true;
+  //animates the key selection
+  function animateStoreKey(key) {
+    return new Promise((resolve) => {
+      const canvas = canvasRef.current;
+      const context = canvasRef.current.getContext("2d");
+      const totalFrames = maxFrames - speed / 2;
+      const startX = key.x + 20;
+      const startY = key.y + 20;
+      const endX = canvas.width - keyBoxLengthAndWidth;
+      const endY = 20 + 30;
+      const xdiffrance = Math.abs(endX - startX);
+      const ydiffrance = Math.abs(endY - startY);
+      const xIncrament = xdiffrance / totalFrames;
+      const yIncrament = ydiffrance / totalFrames;
+      let x = startX;
+      let y = startY;
+      let frameCounter = 0;
+
+      function drawFrame() {
+        //clean the canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        //incrament
+        x = x + xIncrament;
+        y = y - yIncrament;
+
+        //draw the boxes
+        for (const box of arr) {
+          if (box.equals(key)) {
+            box.draw(canvas, context, hilightedColor);
+          } else {
+            box.draw(canvas, context, normalColor);
+          }
+        }
+
+        //Draw the index number
+        context.fillStyle = "white";
+        context.font = "14px Arial";
+        context.fillText(key.value, x, y);
+
+        // Draw the box
+        context.strokeStyle = "white"; // Use the boxColor prop
+        context.strokeRect(canvas.width - 70, 20, 50, 50);
+
+        // Draw the key
+        context.fillStyle = "white";
+        context.font = "16px Arial";
+        context.fillText("Key", canvas.width - 70 + 9, 20 + 70);
+
+        //incrament the frame counter
+        frameCounter++;
+
+        // Check if the max frames limit is reached
+        if (frameCounter < totalFrames) {
+          // Request the next frame
+          requestAnimationFrame(drawFrame);
+        } else {
+          //end the animation
+          for (const box of arr) {
+            if (box.equals(key)) {
+              box.drawAsKey(canvas, context, hilightedColor);
+            } else {
+              box.draw(canvas, context, normalColor);
+            }
+          }
+          resolve();
         }
       }
-      // If no two elements were swapped in the inner loop, then the array is sorted
-      if (!swapped) break;
-    }
 
-    const canvas = canvasRef.current;
-    const context = canvasRef.current.getContext("2d");
+      drawFrame();
+    });
+  }
 
-    for (let i = 0; i < arr.length; i++) {
-      arr[i].setSorted();
-      arr[i].draw(canvas, context, normalColor);
+  function animatePlaceKey(box, key) {
+    return new Promise((resolve) => {
+      const canvas = canvasRef.current;
+      const context = canvasRef.current.getContext("2d");
+      const totalFrames = maxFrames - speed / 2;
+      const startX = canvas.width - keyBoxLengthAndWidth;
+      const startY = 20 + 30;
+      const endX = box.x + 20;
+      const endY = box.y + 20;
+      const xdiffrance = Math.abs(endX - startX);
+      const ydiffrance = Math.abs(endY - startY);
+      const xIncrament = xdiffrance / totalFrames;
+      const yIncrament = ydiffrance / totalFrames;
+      let x = startX;
+      let y = startY;
+      let frameCounter = 0;
+
+      function drawFrame() {
+        //clean the canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        //incrament
+        x = x - xIncrament;
+        y = y + yIncrament;
+
+        //draw the boxes
+        for (const box of arr) {
+          if (!box.equals(key)) {
+            box.draw(canvas, context, normalColor);
+          }
+        }
+
+        //Draw the index number
+        context.fillStyle = "white";
+        context.font = "14px Arial";
+        context.fillText(key.value, x, y);
+
+        // Draw the box
+        context.strokeStyle = "white"; // Use the boxColor prop
+        context.strokeRect(canvas.width - 70, 20, 50, 50);
+
+        // Draw the key
+        context.fillStyle = "white";
+        context.font = "16px Arial";
+        context.fillText("Key", canvas.width - 70 + 9, 20 + 70);
+
+        //incrament the frame counter
+        frameCounter++;
+
+        // Check if the max frames limit is reached
+        if (frameCounter < totalFrames) {
+          // Request the next frame
+          requestAnimationFrame(drawFrame);
+        } else {
+          //end the animation
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          for (const box of arr) {
+            box.draw(canvas, context, normalColor);
+          }
+          resolve();
+        }
+      }
+
+      drawFrame();
+    });
+  }
+
+  async function play() {
+    let tempArr = arr;
+
+    tempArr[0].setSorted();
+
+    setArr(tempArr);
+
+    for (let i = 1; i < arr.length; i++) {
+      // Store the key
+      // Animate the storing of the key
+      let key = arr[i];
+
+      await animateStoreKey(key);
+
+      // wait a few frames
+      await wait(key);
+
+      // Start comparing with the previous elements
+      let j = i - 1;
+
+      // Move elements that are greater than key
+      // to one position ahead of their current position
+      while (j >= 0 && arr[j].value > key.value) {
+        //animate the switch
+        await animateSwap(arr[j + 1], arr[j], key);
+        let tempArr = arr;
+        const tempBox = tempArr[j + 1];
+        tempArr[j + 1] = tempArr[j];
+        tempArr[j] = tempBox;
+        setArr(tempArr);
+        j--;
+      }
+
+      //set it to be part of the sorted array
+      tempArr = arr;
+      tempArr[j + 1].setSorted();
+      setArr(tempArr);
+
+      // wait a few frames
+      await wait(key);
+
+      // Animate Placeing key in its correct position
+      await animatePlaceKey(arr[j + 1], key);
     }
 
     Log("sorted");
@@ -221,9 +413,7 @@ const BubbleSortAnimations = ({
 
       for (const box of arr) {
         // gets the respective height of each box where the max hight os 80% the canvas height and the smallest 10% of the canvas height
-        const h =
-          mapNumber(box.value, min, max, minBoxHight, maxBoxHight) *
-          (height - 3);
+        const h = mapNumber(box.value, min, max, 0.1, 0.8) * (height - 3);
 
         //change y value
         box.setY(height - 3 - h);
@@ -254,9 +444,7 @@ const BubbleSortAnimations = ({
         //change x value
         box.setX(start);
         // gets the respective height of each box where the max hight os 80% the canvas height and the smallest 10% of the canvas height
-        const h =
-          mapNumber(box.value, min, max, minBoxHight, maxBoxHight) *
-          (height - 3);
+        const h = mapNumber(box.value, min, max, 0.1, 0.8) * (height - 3);
 
         //change y value
         box.setY(height - 3 - h);
@@ -363,7 +551,7 @@ const BubbleSortAnimations = ({
 
   return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
 };
-export default BubbleSortAnimations;
-BubbleSortAnimations.prototype = {
+export default InsertionSortAnimations;
+InsertionSortAnimations.prototype = {
   toggle: PropTypes.func.isRequired,
 };

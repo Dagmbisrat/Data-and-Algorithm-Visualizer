@@ -10,7 +10,7 @@ const menuData = [
   },
   {
     title: "Sorting",
-    subMenu: ["Bubble sort", "Insertion Sort", "Merge Sort", "Heap sort"],
+    subMenu: ["Bubble Sort", "Insertion Sort", "Merge Sort", "Heap Sort"],
   },
   {
     title: "Graph Algorithms",
