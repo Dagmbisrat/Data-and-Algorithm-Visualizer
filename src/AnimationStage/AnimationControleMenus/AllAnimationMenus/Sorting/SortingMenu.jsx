@@ -4,6 +4,7 @@ import React, { useState } from "react";
 
 function SortingMenu({
   Add,
+  Remove,
   Clear,
   updateSpeed,
   speed,
@@ -12,6 +13,7 @@ function SortingMenu({
   Sort,
   Random,
 }) {
+  const largestAcceptedInput = 99;
   const handleSpeedChange = (event) => {
     // console.log("handleSpeedChange");
     updateSpeed(event.target.value);
@@ -19,7 +21,12 @@ function SortingMenu({
 
   const handleInputChange = (event) => {
     // console.log("handleInputChange");
-    updateInput(event.target.value);
+    if (
+      event.target.value <= largestAcceptedInput &&
+      event.target.value >= -largestAcceptedInput
+    ) {
+      updateInput(event.target.value);
+    }
   };
 
   return (
@@ -34,6 +41,7 @@ function SortingMenu({
           onChange={handleInputChange}
         />
         <button onClick={Add}> Add </button>
+        <button onClick={Remove}> Remove </button>
         <button onClick={Random}> Random </button>
         <button onClick={Clear}> Clear</button>
         <button onClick={Sort}> Sort</button>

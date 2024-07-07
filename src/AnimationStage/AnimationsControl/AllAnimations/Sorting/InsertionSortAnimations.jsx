@@ -5,6 +5,7 @@ const InsertionSortAnimations = ({
   speed,
   height,
   Add,
+  Remove,
   Random,
   Clear,
   Input,
@@ -43,7 +44,7 @@ const InsertionSortAnimations = ({
       this.x = this.x + value;
     }
     moveY(value) {
-      this.y = this.y + value;
+      this.y += value;
     }
     setSorted() {
       this.sorted = true;
@@ -274,6 +275,7 @@ const InsertionSortAnimations = ({
     });
   }
 
+  //animates puttin the key to the correct postion
   function animatePlaceKey(box, key) {
     return new Promise((resolve) => {
       const canvas = canvasRef.current;
@@ -342,10 +344,14 @@ const InsertionSortAnimations = ({
   }
 
   async function play() {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+
+    setisAnimating(true); //first set animating to true
+
+    console.log("1 is green");
     let tempArr = arr;
-
     tempArr[0].setSorted();
-
     setArr(tempArr);
 
     for (let i = 1; i < arr.length; i++) {
@@ -385,7 +391,11 @@ const InsertionSortAnimations = ({
       // Animate Placeing key in its correct position
       await animatePlaceKey(arr[j + 1], key);
     }
-
+    for (let i = 0; i < arr.length; i++) {
+      arr[i].setSorted();
+      arr[i].draw(canvas, context, normalColor);
+    }
+    setisAnimating(false);
     Log("sorted");
   }
 
@@ -473,6 +483,24 @@ const InsertionSortAnimations = ({
     }
   }, [Add]);
 
+  //Removes the last index in the array wehn remove button is pressed
+  useEffect(() => {
+    //checks if the canvas has alredy mounted so that the use effect dosent run on mount
+    //And also makes sure there isnt any annimations going on
+    if (isMounted.current && !isAnimating) {
+      //checks if arr is empty
+      if (arr.length < 1) {
+        Log("Cannot remove: Array is Empty");
+      } else {
+        //else remove the last element
+        const removedValue = arr[arr.length - 1].value;
+        const newArr = arr.slice(0, -1);
+        setArr(newArr);
+        Log("Remove " + removedValue);
+      }
+    }
+  }, [Remove]);
+
   //Sets a Random set of arrays for arr
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
@@ -497,12 +525,10 @@ const InsertionSortAnimations = ({
 
   //handels any sorting
   useEffect(() => {
-    if (isMounted.current) {
-      setisAnimating(true); //first set animating to true
-
+    //makes shure the componet is alredy monted
+    //also makes sure it isn't alredy animating
+    if (isMounted.current && !isAnimating) {
       play();
-
-      setisAnimating(false);
     }
   }, [Sort]);
 
@@ -534,17 +560,14 @@ const InsertionSortAnimations = ({
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     if (canvas) {
+      //console.log(isAnimating);
       canvas.height = height - 3;
       canvas.width = windowWidth - menuWidth;
       context.clearRect(0, 0, canvas.width, canvas.height);
       //updates the values then draws them only when its not sorting
-      if (!isAnimating) {
-        updateAll();
-        for (const box of arr) {
-          box.draw(canvas, context, normalColor);
-        }
-      } else {
-        updateY();
+      updateAll();
+      for (const box of arr) {
+        box.draw(canvas, context, normalColor);
       }
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);

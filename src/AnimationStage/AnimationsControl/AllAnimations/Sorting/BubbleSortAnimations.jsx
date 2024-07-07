@@ -6,6 +6,7 @@ const BubbleSortAnimations = ({
   speed,
   height,
   Add,
+  Remove,
   Random,
   Clear,
   Input,
@@ -22,8 +23,8 @@ const BubbleSortAnimations = ({
   const maxBoxHight = 0.8; //the Max box hight (as a percentage of the canvas hight)
   const maxArrsize = 15;
   const boxWidth = 45;
-  const maxInt = 50;
-  const minInt = -50;
+  const maxInt = 99;
+  const minInt = -99;
   const maxFrames = 55;
   const normalColor = "gray";
   const hilightedColor = "red";
@@ -40,7 +41,7 @@ const BubbleSortAnimations = ({
       this.y = y;
     }
     moveX(value) {
-      this.x = this.x + value;
+      this.x += value;
     }
 
     setSorted() {
@@ -165,6 +166,7 @@ const BubbleSortAnimations = ({
   }
 
   async function play() {
+    setisAnimating(true); //first set animating to true
     let n = arr.length;
     for (let i = 0; i < n - 1; i++) {
       let swapped = false;
@@ -193,7 +195,7 @@ const BubbleSortAnimations = ({
       arr[i].setSorted();
       arr[i].draw(canvas, context, normalColor);
     }
-
+    setisAnimating(false); //first set animating to true
     Log("sorted");
   }
 
@@ -281,9 +283,28 @@ const BubbleSortAnimations = ({
       } else {
         setArr([...arr, new Box(parseInt(Input, 10))]); //need to parseInt since the bare Input is a string and this causes problems when finding the max and min value in arr
         Log("Added " + Input);
+        console.log(arr);
       }
     }
   }, [Add]);
+
+  //Removes the last index in the array wehn remove button is pressed
+  useEffect(() => {
+    //checks if the canvas has alredy mounted so that the use effect dosent run on mount
+    //And also makes sure there isnt any annimations going on
+    if (isMounted.current && !isAnimating) {
+      //checks if arr is empty
+      if (arr.length < 1) {
+        Log("Cannot remove: Array is Empty");
+      } else {
+        //else remove the last element
+        const removedValue = arr[arr.length - 1].value;
+        const newArr = arr.slice(0, -1);
+        setArr(newArr);
+        Log("Remove " + removedValue);
+      }
+    }
+  }, [Remove]);
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
@@ -309,12 +330,10 @@ const BubbleSortAnimations = ({
 
   //handels any sorting
   useEffect(() => {
-    if (isMounted.current) {
-      setisAnimating(true); //first set animating to true
-
+    //make shure it dosent run on start
+    // check if its alredy animation
+    if (isMounted.current && !isAnimating) {
       play();
-
-      setisAnimating(false);
     }
   }, [Sort]);
 
@@ -349,14 +368,11 @@ const BubbleSortAnimations = ({
       canvas.height = height - 3;
       canvas.width = windowWidth - menuWidth;
       context.clearRect(0, 0, canvas.width, canvas.height);
-      //updates the values then draws them only when its not sorting
-      if (!isAnimating) {
-        updateAll();
-        for (const box of arr) {
-          box.draw(canvas, context, normalColor);
-        }
-      } else {
-        updateY();
+      //updates the x and y values then redraws them
+      // console.log(isAnimating);
+      updateAll();
+      for (const box of arr) {
+        box.draw(canvas, context, normalColor);
       }
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);

@@ -184,6 +184,7 @@ function ControleMenu({
         <>
           <SortingMenu
             Add={Add}
+            Remove={Remove}
             Clear={Clear}
             updateSpeed={updateSpeed_}
             speed={speed}
@@ -208,6 +209,7 @@ function ControleMenu({
         <>
           <SortingMenu
             Add={Add}
+            Remove={Remove}
             Clear={Clear}
             updateSpeed={updateSpeed_}
             speed={speed}

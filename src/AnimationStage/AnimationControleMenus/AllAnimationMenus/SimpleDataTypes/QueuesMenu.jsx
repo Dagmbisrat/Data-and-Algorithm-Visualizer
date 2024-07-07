@@ -11,6 +11,7 @@ function QueuesMenu({
   Input,
   updateInput,
 }) {
+  const largestAcceptedInput = 99;
   const handleSpeedChange = (event) => {
     // console.log("handleSpeedChange");
     updateSpeed(event.target.value);
@@ -18,7 +19,12 @@ function QueuesMenu({
 
   const handleInputChange = (event) => {
     // console.log("handleInputChange");
-    updateInput(event.target.value);
+    if (
+      event.target.value <= largestAcceptedInput &&
+      event.target.value >= -largestAcceptedInput
+    ) {
+      updateInput(event.target.value);
+    }
   };
 
   return (
