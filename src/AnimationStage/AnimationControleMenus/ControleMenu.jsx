@@ -19,6 +19,7 @@ function ControleMenu({
   Random,
 }) {
   const isMounted = useRef(false);
+
   const updateSpeed_ = (num) => {
     updateSpeed(num);
   };
@@ -37,6 +38,7 @@ function ControleMenu({
   const [insertionSortConsoleOuput, setInsertionSortConsoleOuput] = useState(
     [],
   );
+  const [mergeSortConsoleOuput, setmergeSortConsoleOuput] = useState([]);
 
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
@@ -46,6 +48,7 @@ function ControleMenu({
     setQueueslinkedListConsoleOuput([]);
     setBubbleSortConsoleOuput([]);
     setInsertionSortConsoleOuput([]);
+    setmergeSortConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
@@ -77,6 +80,11 @@ function ControleMenu({
         case "Insertion Sort":
           setInsertionSortConsoleOuput([
             ...insertionSortConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "Merge Sort":
+          setmergeSortConsoleOuput([
+            ...mergeSortConsoleOuput,
             " > " + LoggedMessage,
           ]);
       }
@@ -222,6 +230,31 @@ function ControleMenu({
           <div className="Console-Text">
             <ul className="list">
               {insertionSortConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Merge Sort":
+      return (
+        <>
+          <SortingMenu
+            Add={Add}
+            Remove={Remove}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Random={Random}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {mergeSortConsoleOuput.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>

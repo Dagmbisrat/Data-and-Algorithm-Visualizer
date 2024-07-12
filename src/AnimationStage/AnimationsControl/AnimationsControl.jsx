@@ -7,6 +7,7 @@ import StackslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Stacks-l
 import QueueslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Queues-linkedListAnimation.jsx";
 import BubbleSortAnimations from "./AllAnimations/Sorting/BubbleSortAnimations.jsx";
 import InsertionSortAnimations from "./AllAnimations/Sorting/InsertionSortAnimations.jsx";
+import MergeSortAnimations from "./AllAnimations/Sorting/MergeSortAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -121,6 +122,22 @@ const Animations = ({
     case "Insertion Sort":
       return (
         <InsertionSortAnimations
+          speed={speed}
+          height={height}
+          Add={Add}
+          Remove={Remove}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Sort={Sort}
+        />
+      );
+
+    case "Merge Sort":
+      return (
+        <MergeSortAnimations
           speed={speed}
           height={height}
           Add={Add}

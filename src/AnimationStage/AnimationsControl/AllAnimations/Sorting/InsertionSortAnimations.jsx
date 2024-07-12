@@ -18,6 +18,8 @@ const InsertionSortAnimations = ({
   const [isAnimating, setisAnimating] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [arr, setArr] = useState([]);
+  const minBoxHight = 0.1; //the minimum box hight (as a percentage of tecanvas hight)
+  const maxBoxHight = 0.8; //the Max box hight (as a percentage of the canvas hight)
   const maxArrsize = 15;
   const boxWidth = 45;
   const keyBoxLengthAndWidth = 50;
@@ -63,7 +65,7 @@ const InsertionSortAnimations = ({
       //Draw the index number
       context.fillStyle = "white";
       context.font = "14px Arial";
-      context.fillText(this.value, this.x + 20, this.y + 20);
+      context.fillText(this.value, this.x + 16, this.y + 20);
     }
 
     drawAsKey(canvas, context, color) {
@@ -349,7 +351,6 @@ const InsertionSortAnimations = ({
 
     setisAnimating(true); //first set animating to true
 
-    console.log("1 is green");
     let tempArr = arr;
     tempArr[0].setSorted();
     setArr(tempArr);
@@ -408,29 +409,6 @@ const InsertionSortAnimations = ({
     return ((value - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
   }
 
-  //updates the Y values
-  const updateY = () => {
-    if (arr.length > 0) {
-      //find the largest value in the array
-      const max = arr.reduce((max, current) => {
-        return current.value > max.value ? current : max;
-      }, arr[0]).value;
-
-      //find the smallest value in the array
-      const min = arr.reduce((min, current) => {
-        return current.value < min.value ? current : min;
-      }, arr[0]).value;
-
-      for (const box of arr) {
-        // gets the respective height of each box where the max hight os 80% the canvas height and the smallest 10% of the canvas height
-        const h = mapNumber(box.value, min, max, 0.1, 0.8) * (height - 3);
-
-        //change y value
-        box.setY(height - 3 - h);
-      }
-    }
-  };
-
   //updates all the x and y values of each box in the array for proper displaying
   const updateAll = () => {
     //everything should happen if the array isnt empty
@@ -454,7 +432,9 @@ const InsertionSortAnimations = ({
         //change x value
         box.setX(start);
         // gets the respective height of each box where the max hight os 80% the canvas height and the smallest 10% of the canvas height
-        const h = mapNumber(box.value, min, max, 0.1, 0.8) * (height - 3);
+        const h =
+          mapNumber(box.value, min, max, minBoxHight, maxBoxHight) *
+          (height - 3);
 
         //change y value
         box.setY(height - 3 - h);
@@ -528,7 +508,11 @@ const InsertionSortAnimations = ({
     //makes shure the componet is alredy monted
     //also makes sure it isn't alredy animating
     if (isMounted.current && !isAnimating) {
-      play();
+      if (arr.length > 0) {
+        play();
+      } else {
+        Log("Error: Cannot Sort an Empty Array");
+      }
     }
   }, [Sort]);
 
