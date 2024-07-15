@@ -130,7 +130,6 @@ const BubbleSortAnimations = ({
           box2.moveX(incramentValue);
         } else {
           //move box2 left and box1 right
-
           box1.moveX(incramentValue);
           box2.moveX(-incramentValue);
         }

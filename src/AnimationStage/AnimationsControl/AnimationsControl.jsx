@@ -8,6 +8,7 @@ import QueueslinkedListAnimations from "./AllAnimations/SimpleDataTypes/Queues-l
 import BubbleSortAnimations from "./AllAnimations/Sorting/BubbleSortAnimations.jsx";
 import InsertionSortAnimations from "./AllAnimations/Sorting/InsertionSortAnimations.jsx";
 import MergeSortAnimations from "./AllAnimations/Sorting/MergeSortAnimations.jsx";
+import HeapSortAnimations from "./AllAnimations/Sorting/HeapSortAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -138,6 +139,22 @@ const Animations = ({
     case "Merge Sort":
       return (
         <MergeSortAnimations
+          speed={speed}
+          height={height}
+          Add={Add}
+          Remove={Remove}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Sort={Sort}
+        />
+      );
+
+    case "Heap Sort":
+      return (
+        <HeapSortAnimations
           speed={speed}
           height={height}
           Add={Add}

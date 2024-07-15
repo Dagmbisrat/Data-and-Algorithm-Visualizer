@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import _ from "lodash";
 
 const MergeSortAnimations = ({
   speed,
@@ -36,6 +35,7 @@ const MergeSortAnimations = ({
   class Box {
     constructor(value) {
       this.value = value;
+      this.sorted = false;
       this.display = true;
     }
     setX(x) {

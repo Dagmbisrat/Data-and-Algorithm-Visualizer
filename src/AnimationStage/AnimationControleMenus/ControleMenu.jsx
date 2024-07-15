@@ -39,6 +39,7 @@ function ControleMenu({
     [],
   );
   const [mergeSortConsoleOuput, setmergeSortConsoleOuput] = useState([]);
+  const [heapSortConsoleOuput, setHeapSortConsoleOuput] = useState([]);
 
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
@@ -49,6 +50,7 @@ function ControleMenu({
     setBubbleSortConsoleOuput([]);
     setInsertionSortConsoleOuput([]);
     setmergeSortConsoleOuput([]);
+    setHeapSortConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
@@ -85,6 +87,11 @@ function ControleMenu({
         case "Merge Sort":
           setmergeSortConsoleOuput([
             ...mergeSortConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "Heap Sort":
+          setHeapSortConsoleOuput([
+            ...heapSortConsoleOuput,
             " > " + LoggedMessage,
           ]);
       }
@@ -255,6 +262,31 @@ function ControleMenu({
           <div className="Console-Text">
             <ul className="list">
               {mergeSortConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Heap Sort":
+      return (
+        <>
+          <SortingMenu
+            Add={Add}
+            Remove={Remove}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Random={Random}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {heapSortConsoleOuput.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
