@@ -10,6 +10,7 @@ import InsertionSortAnimations from "./AllAnimations/Sorting/InsertionSortAnimat
 import MergeSortAnimations from "./AllAnimations/Sorting/MergeSortAnimations.jsx";
 import HeapSortAnimations from "./AllAnimations/Sorting/HeapSortAnimations.jsx";
 import BreathFirstSearchAnimations from "./AllAnimations/Graphs/BreathFirstSearchAnimations.jsx";
+import DepthFirstSearchAnimations from "./AllAnimations/Graphs/DepthFirstSearchAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -171,6 +172,19 @@ const Animations = ({
     case "Breath First Search":
       return (
         <BreathFirstSearchAnimations
+          speed={speed}
+          height={height}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Search={Sort}
+        />
+      );
+    case "Depth First Search":
+      return (
+        <DepthFirstSearchAnimations
           speed={speed}
           height={height}
           Random={Random}
