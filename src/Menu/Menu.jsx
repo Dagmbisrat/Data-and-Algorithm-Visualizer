@@ -24,10 +24,6 @@ const menuData = [
     title: "Dynamic Programming",
     subMenu: [],
   },
-  {
-    title: "Greedy",
-    subMenu: [],
-  },
 ];
 
 function Menu({ menuToggle, doAnimation }) {

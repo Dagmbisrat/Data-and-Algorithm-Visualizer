@@ -423,7 +423,7 @@ const HeapSortAnimations = ({
     if (arr.length > 0) {
       //Finds the starting x value postion for the array
       let xstart =
-        (windowWidth - menuWidth) / 2 - (arr.length * (boxWidth + 2)) / 2;
+        (windowWidth - menuWidth) / 2 - (arr.length * (boxWidth + 3)) / 2;
 
       //loop's through the array and updates all the x and y variables for each box
       for (let i = 0; i < arr.length; i++) {
@@ -554,4 +554,9 @@ const HeapSortAnimations = ({
   }, [height, windowWidth, menuWidth, arr, isAnimating]);
 
   return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+};
+
+export default HeapSortAnimations;
+HeapSortAnimations.prototype = {
+  toggle: PropTypes.func.isRequired,
 };

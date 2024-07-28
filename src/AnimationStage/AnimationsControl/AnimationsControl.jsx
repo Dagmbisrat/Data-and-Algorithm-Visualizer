@@ -9,6 +9,7 @@ import BubbleSortAnimations from "./AllAnimations/Sorting/BubbleSortAnimations.j
 import InsertionSortAnimations from "./AllAnimations/Sorting/InsertionSortAnimations.jsx";
 import MergeSortAnimations from "./AllAnimations/Sorting/MergeSortAnimations.jsx";
 import HeapSortAnimations from "./AllAnimations/Sorting/HeapSortAnimations.jsx";
+import BreathFirstSearchAnimations from "./AllAnimations/Graphs/BreathFirstSearchAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -165,6 +166,19 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+        />
+      );
+    case "Breath First Search":
+      return (
+        <BreathFirstSearchAnimations
+          speed={speed}
+          height={height}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Search={Sort}
         />
       );
 
