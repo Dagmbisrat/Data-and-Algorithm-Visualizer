@@ -271,16 +271,20 @@ const BreathFirstSearchAnimations = ({
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      for (const nodes of graph[0]) {
-        nodes.UnSearched();
-      }
-      for (const list of graph[1]) {
-        for (const edges of list) {
-          edges.UnSearched();
+      if (graph[0].length) {
+        for (const nodes of graph[0]) {
+          nodes.UnSearched();
         }
+        for (const list of graph[1]) {
+          for (const edges of list) {
+            edges.UnSearched();
+          }
+        }
+        setGraph(copyGraph(graph));
+        Log("Cleard!");
+      } else {
+        Log("Cannot unserch empty graph!");
       }
-      setGraph(copyGraph(graph));
-      Log("Cleard!");
     }
   }, [Clear]);
 

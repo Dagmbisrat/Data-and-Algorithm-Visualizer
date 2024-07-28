@@ -39,7 +39,7 @@ function GraphsMenu({
           onChange={handleInputChange}
         /> */}
         <button onClick={Random}> Random </button>
-        <button onClick={Clear}> Clear</button>
+        <button onClick={Clear}> UnSearch</button>
         <button onClick={Sort}> Search</button>
         <div className="slidecontainer">
           <p>Speed</p>
