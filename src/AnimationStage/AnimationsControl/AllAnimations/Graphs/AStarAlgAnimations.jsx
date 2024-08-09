@@ -299,7 +299,7 @@ const AStarAlgAniamtions = ({
           2,
         ),
     );
-    return Math.ceil(result / 10);
+    return Math.ceil(result / 100);
   }
 
   function reconstructPath(cameFrom, current) {
