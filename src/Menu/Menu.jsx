@@ -14,7 +14,12 @@ const menuData = [
   },
   {
     title: "Graph Algorithms",
-    subMenu: ["Breath First Search", "Depth First Search", "Dijkstra's Alg"],
+    subMenu: [
+      "Breath First Search",
+      "Depth First Search",
+      "Dijkstra's Alg",
+      "A* Alg",
+    ],
   },
   {
     title: "Divide and Conquer",

@@ -1,29 +1,30 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import cytoscape from "cytoscape";
+import { constant, endsWith, template } from "lodash";
 
-const BreathFirstSearchAnimations = ({
+const DijkstrasAlgAnimations = ({
   speed,
   height,
   Random,
   Clear,
-  Input,
   menuWidth,
   Log,
   Search,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
-  const maxArrsize = 10;
+  const maxArrsize = 6;
+  const rootNode = 0;
+  const targetNode = maxArrsize - 1;
   const [isAnimating, setisAnimating] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [graph, setGraph] = useState([
     [],
     new Array(maxArrsize).fill().map(() => []),
   ]);
-
+  const maxEdgeWeight = 50;
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
-
   const normalColor = "gray";
   const edgeNormColor = "white";
 
@@ -36,6 +37,8 @@ const BreathFirstSearchAnimations = ({
         x: getRandomNum(0, windowWidth - menuWidth),
         y: getRandomNum(0, height - 3),
       };
+      this.label = "";
+      this.type = "Normal";
     }
     Searched() {
       this.searched = true;
@@ -46,25 +49,55 @@ const BreathFirstSearchAnimations = ({
     getColor() {
       return this.searched ? "green" : normalColor;
     }
+    getShape() {
+      if (this.type == "start") return "star";
+      if (this.type == "target") return "hexagon";
+      return "ellipse";
+    }
   }
 
   //the class that represents the vertex
   class Edge {
-    constructor(data) {
+    constructor(data, weight) {
       this.data = data;
       this.searched == false;
+      this.weight = weight;
+      this.Color = edgeNormColor;
     }
-    Searched() {
-      this.searched = true;
+    setWeight(weight) {
+      this.weight = weight;
     }
-    UnSearched() {
-      this.searched = false;
+    setColor(color) {
+      this.Color = color;
     }
     getData() {
       return this.data;
     }
     getColor() {
-      return this.searched ? "green" : edgeNormColor;
+      return this.Color;
+    }
+  }
+
+  class PriorityQueue {
+    constructor() {
+      this.nodes = [];
+    }
+
+    enqueue(priority, key) {
+      this.nodes.push({ key, priority });
+      this.sort();
+    }
+
+    dequeue() {
+      return this.nodes.shift();
+    }
+
+    sort() {
+      this.nodes.sort((a, b) => a.priority - b.priority);
+    }
+
+    isEmpty() {
+      return !this.nodes.length;
     }
   }
 
@@ -82,6 +115,8 @@ const BreathFirstSearchAnimations = ({
         data: {
           id: graph[0][i].data,
           color: graph[0][i].getColor(),
+          label: graph[0][i].label,
+          shape: graph[0][i].getShape(),
         },
         position: { x: graph[0][i].position.x, y: graph[0][i].position.y },
       });
@@ -96,6 +131,7 @@ const BreathFirstSearchAnimations = ({
             source: graph[0][i].data,
             target: graph[1][i][j].data,
             color: graph[1][i][j].getColor(),
+            weight: graph[1][i][j].weight,
           },
         });
       }
@@ -108,11 +144,13 @@ const BreathFirstSearchAnimations = ({
     return array.some((obj) => obj.data === char);
   }
 
-  function hasEdge(array, data) {
-    for (const edge of array) {
-      if (edge.data == data) {
-        return true;
-      }
+  //returns true or false if an specific edge exsists in the graph
+  function hasEdge(data1, data2, graph) {
+    const index1 = get(graph[0], data1);
+    const index2 = get(graph[0], data2);
+
+    if (has(graph[1][index1], data2) || has(graph[1][index2], data1)) {
+      return true;
     }
 
     return false;
@@ -126,7 +164,12 @@ const BreathFirstSearchAnimations = ({
     function addEdge(node1, node2) {
       // console.log(node1);
       // console.log(node2);
-      edges[node1].push(new Edge(vertices[node2].data));
+      edges[node1].push(
+        new Edge(
+          vertices[node2].data,
+          getRandomNum(-maxEdgeWeight, maxEdgeWeight),
+        ),
+      );
       // console.log(edges);
     }
 
@@ -140,15 +183,27 @@ const BreathFirstSearchAnimations = ({
       addEdge(node1, node2);
     }
 
+    function getWeight(array, data) {
+      for (const edge of array) {
+        if (edge.data == data) {
+          return edge.weight;
+        }
+      }
+
+      return 0;
+    }
+
     //turn it into a proper adjacency list
     for (let i = 0; i < maxArrsize; i++) {
       const nodeData = vertices[i].data; //gets the node we are lokking for
 
       for (let j = 0; j < maxArrsize; j++) {
         //goes through the whole list
-        if (i != j && hasEdge(edges[j], nodeData)) {
+        if (i != j && has(edges[j], nodeData)) {
           //if the array contains node
-          edges[i].push(new Edge(vertices[j].data)); //add the node that has the selected node in its list to the list for the selected node
+          edges[i].push(
+            new Edge(vertices[j].data, getWeight(edges[j], nodeData)),
+          ); //add the node that has the selected node in its list to the list for the selected node
         }
       }
     }
@@ -177,6 +232,8 @@ const BreathFirstSearchAnimations = ({
       let copy = new Nodes(node.data);
       copy.position = node.position;
       copy.searched = node.searched;
+      copy.label = node.label;
+      copy.type = node.type;
 
       tempGraph[0].push(copy);
     }
@@ -184,42 +241,111 @@ const BreathFirstSearchAnimations = ({
     return tempGraph;
   }
 
-  function bfs(startNode) {
-    const visited = new Set(); // To track visited nodes
-    const queue = [startNode]; // Initialize the queue with the start node index
-    const result = []; // To store the order of traversal
-    const traversedEdges = []; // To store the traversed edges
+  //color the edge helper function
+  function colorEdge(set, color, stayChanged) {
+    return new Promise((resolve) => {
+      let i = get(graph[1][set[0]], graph[0][set[1]].data);
+      graph[1][set[0]][i].setColor(color);
+      setGraph(copyGraph(graph));
+      i = get(graph[1][set[1]], graph[0][set[0]].data);
+      graph[1][set[1]][i].setColor(color);
+      setGraph(copyGraph(graph));
+      setTimeout(
+        () => {
+          if (!stayChanged) {
+            let i = get(graph[1][set[0]], graph[0][set[1]].data);
+            graph[1][set[0]][i].setColor("white");
+            setGraph(copyGraph(graph));
+            i = get(graph[1][set[1]], graph[0][set[0]].data);
+            graph[1][set[1]][i].setColor("white");
+            setGraph(copyGraph(graph));
+          }
+          resolve();
+        },
+        mapNumber(speed, 100, 1, 750, 1500),
+      );
+    });
+  }
 
-    function hasPair(arr) {
-      for (const pairs of traversedEdges) {
-        if (pairs[0] == arr[0] && pairs[1] == arr[1]) {
-          return true;
-        }
+  function setNodeDistances(distances) {
+    return new Promise((resolve) => {
+      for (let i = 0; i < graph[0].length; i++) {
+        graph[0][i].label = distances[i];
       }
-      return false;
-    }
+      setGraph(copyGraph(graph));
+      setTimeout(
+        () => {
+          resolve();
+        },
+        mapNumber(speed, 100, 1, 750, 2000),
+      );
+    });
+  }
 
-    while (queue.length > 0) {
-      const node = queue.shift(); // Dequeue a node
+  async function dijkstra(source, target) {
+    return new Promise(async (resolve) => {
+      const distances = {};
+      const previous = {};
+      const pq = new PriorityQueue();
 
-      if (!visited.has(node)) {
-        visited.add(node); // Mark the node as visited
-        result.push(node); // Add the node to the result
+      // Set the initial distances to Infinity and source distance to 0
+      for (let i = 0; i < graph[0].length; i++) {
+        if (i === source) {
+          distances[i] = 0;
+          pq.enqueue(0, i);
+        } else {
+          distances[i] = Infinity;
+        }
+        previous[i] = null;
+      }
+      //set the nodes distnaces
+      await setNodeDistances(distances);
 
-        // Enqueue all adjacent nodes that haven't been visited
-        for (const neighbor of graph[1][node]) {
-          const index = get(graph[0], neighbor.data); //gets the index of the neighbor
-          if (!visited.has(index)) {
-            queue.push(index);
-            if (!hasPair([node, index])) {
-              traversedEdges.push([node, index]); // Add the edge to the traversed edges
-            }
+      while (!pq.isEmpty()) {
+        const { key: currentNode } = pq.dequeue();
+
+        // If we reach the target node, stop the algorithm
+        if (currentNode === target) break;
+
+        // Check each neighbor of the current node
+        for (const neighbor of graph[1][currentNode]) {
+          const node = get(graph[0], neighbor.data);
+          const { weight } = neighbor;
+          const newDistance = distances[currentNode] + weight;
+
+          //color the neighbor edge since the path is
+          await colorEdge([currentNode, node], "red", false);
+
+          // If a shorter path to the neighbor is found
+          if (newDistance < distances[node]) {
+            distances[node] = newDistance;
+
+            //set the nodes distnaces
+            await setNodeDistances(distances);
+
+            previous[node] = currentNode;
+            pq.enqueue(newDistance, node);
           }
         }
       }
-    }
 
-    return [result, traversedEdges];
+      // Reconstruct the shortest path from source to target
+      const path = [];
+      const traversedEdges = [];
+      let currentNode = target;
+      while (currentNode !== null && previous[currentNode] !== null) {
+        path.unshift(currentNode);
+        traversedEdges.unshift([previous[currentNode], currentNode]);
+        currentNode = previous[currentNode];
+      }
+
+      // Include the source node in the path if it exists
+      if (path.length > 0) {
+        path.unshift(source);
+      }
+
+      resolve([path, traversedEdges]);
+    });
   }
 
   //function that maps a value
@@ -241,26 +367,45 @@ const BreathFirstSearchAnimations = ({
         const char = getRandomCharacter();
         if (!has(tempGraph[0], char)) {
           tempGraph[0].push(new Nodes(char));
+          if (i == rootNode) tempGraph[0][i].type = "start";
+          if (i == targetNode) tempGraph[0][i].type = "target";
         } else {
           i--;
         }
       }
 
-      tempGraph[1] = generateRandomSpanningTree(tempGraph[0]);
-
       //givies a random adjacency list
-      // for (let i = 0; i < maxArrsize; i++) {
-      //   const randNumOfAdjacentNodes = getRandomNum(1, maxArrsize - 1);
+      for (let i = 0; i < maxArrsize; i++) {
+        const randNumOfAdjacentNodes = getRandomNum(1, maxArrsize - 1);
 
-      //   for (let j = 0; j < randNumOfAdjacentNodes; j++) {
-      //     const char = tempGraph[0][getRandomNum(0, maxArrsize - 1)].data;
-      //     if (!has(tempGraph[1][i], char) && char != tempGraph[0][i].data) {
-      //       tempGraph[1][i].push(new Edge(char));
-      //     } else {
-      //       j--;
-      //     }
-      //   }
-      // }.
+        for (let j = 0; j < randNumOfAdjacentNodes; j++) {
+          const char = tempGraph[0][getRandomNum(0, maxArrsize - 1)].data;
+          const newEdge = new Edge(char, getRandomNum(1, maxEdgeWeight));
+
+          //Makes shure the edge isnt to itself and the edge dosnt exisit
+          if (
+            char != tempGraph[0][i].data &&
+            !hasEdge(char, tempGraph[0][i].data, tempGraph)
+          ) {
+            tempGraph[1][i].push(newEdge);
+          }
+        }
+      }
+
+      //makes a nice adjancey list
+      for (let i = 0; i < maxArrsize; i++) {
+        //first goes through the edges and its adjcent list
+        const sourceNode = tempGraph[0][i].data; //gets the node we are lokking for
+        const sourceNodeIndex = i;
+        for (let j = 0; j < tempGraph[1][i].length; j++) {
+          const targetNode = tempGraph[1][i][j].data;
+          const targetNodeIndex = get(tempGraph[0], targetNode);
+          if (!has(tempGraph[1][targetNodeIndex], sourceNode)) {
+            const weight = tempGraph[1][sourceNodeIndex][j].weight;
+            tempGraph[1][targetNodeIndex].push(new Edge(sourceNode, weight));
+          }
+        }
+      }
 
       console.log(tempGraph);
       setGraph(tempGraph);
@@ -274,10 +419,11 @@ const BreathFirstSearchAnimations = ({
       if (graph[0].length) {
         for (const nodes of graph[0]) {
           nodes.UnSearched();
+          nodes.label = "";
         }
         for (const list of graph[1]) {
           for (const edges of list) {
-            edges.UnSearched();
+            edges.setColor(edgeNormColor);
           }
         }
         setGraph(copyGraph(graph));
@@ -293,14 +439,8 @@ const BreathFirstSearchAnimations = ({
     if (isMounted.current && !isAnimating) {
       setisAnimating(true);
 
-      const rootNode = 0;
-
-      const bfsTraversalList = bfs(rootNode)[0];
-      const bfsEdgeTraversalList = bfs(rootNode)[1];
-      console.log(bfs(rootNode));
-
       //set visited helper function
-      function setVisited(index, edge) {
+      function setVisited(index) {
         return new Promise((resolve) => {
           setTimeout(
             () => {
@@ -314,28 +454,30 @@ const BreathFirstSearchAnimations = ({
         });
       }
 
-      //color the edge helper function
-      function colorEdge(set) {
-        return new Promise((resolve) => {
-          let i = get(graph[1][set[0]], graph[0][set[1]].data);
-          graph[1][set[0]][i].Searched();
-          setGraph(copyGraph(graph));
-          i = get(graph[1][set[1]], graph[0][set[0]].data);
-          graph[1][set[1]][i].Searched();
-          setGraph(copyGraph(graph));
-          resolve();
-        });
-      }
-
       // Function that processes each element in the array with a delay
       async function processArrayWithDelay() {
-        await setVisited(bfsTraversalList[0]); //visit the node
-        for (let i = 1; i < bfsTraversalList.length; i++) {
-          await setVisited(bfsTraversalList[i]); //visit the node
-          await colorEdge(bfsEdgeTraversalList[i - 1]);
+        Log(
+          "Fiding path from " +
+            graph[0][rootNode].data +
+            " to " +
+            graph[0][targetNode].data,
+        );
+
+        const answerArr = await dijkstra(rootNode, targetNode);
+
+        console.log(answerArr[1]);
+        const traversalList = answerArr[0];
+        const edgeTraversalList = answerArr[1];
+
+        await setVisited(traversalList[0]); //visit the node
+        for (let i = 1; i < traversalList.length; i++) {
+          await setVisited(traversalList[i]); //visit the node
+          await colorEdge(edgeTraversalList[i - 1], "green", true);
         }
 
-        Log("Searchd!");
+        Log(
+          "Path Found with the length of " + graph[0][targetNode].label + "!",
+        );
         setisAnimating(false);
       }
 
@@ -388,19 +530,39 @@ const BreathFirstSearchAnimations = ({
           {
             selector: "node",
             style: {
-              "background-color": "data(color)",
+              // Node shape and size
+              shape: "data(shape)",
               width: "30",
               height: "30",
-              label: "data(id)",
+              "background-color": "data(color)",
             },
           },
           {
             selector: "edge",
             style: {
+              label: "data(weight)",
               width: 3,
               "line-color": "data(color)", // use the color defined in the data attribute
               "target-arrow-color": "data(color)", // use the color defined in the data attribute
               "target-arrow-shape": "triangle",
+              "font-size": "15px",
+              "font-weight": "bold",
+              "text-background-color": "data(color)", // Optional: Background color of the text
+              "text-background-opacity": 1, // Optional: Make the background color visible
+            },
+          },
+          {
+            selector: "node[label]",
+            style: {
+              "text-wrap": "wrap",
+              "text-max-width": "60px",
+              "text-valign": "top",
+              "text-margin-y": "20px", // Adjust this value to position the label
+              "font-size": "12px",
+              "font-weight": "bold",
+              label: function (ele) {
+                return ele.data("label") + "\n\n" + ele.data("id");
+              },
             },
           },
         ],
@@ -433,7 +595,7 @@ const BreathFirstSearchAnimations = ({
     />
   );
 };
-export default BreathFirstSearchAnimations;
-BreathFirstSearchAnimations.prototype = {
+export default DijkstrasAlgAnimations;
+DijkstrasAlgAnimations.prototype = {
   toggle: PropTypes.func.isRequired,
 };

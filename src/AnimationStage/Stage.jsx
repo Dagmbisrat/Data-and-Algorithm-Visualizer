@@ -1,7 +1,7 @@
 import "./Stage.css";
 import ControleMenu from "./AnimationControleMenus/ControleMenu.jsx";
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Animations from "./AnimationsControl/AnimationsControl.jsx";
 
 function Stage({ Animation_name, menuWidth }) {
@@ -60,6 +60,10 @@ function Stage({ Animation_name, menuWidth }) {
   const log = (message) => {
     setloggedMessage(message);
   };
+
+  useEffect(() => {
+    setloggedMessage("");
+  }, [Animation_name]);
 
   return (
     <div

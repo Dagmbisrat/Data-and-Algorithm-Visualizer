@@ -47,6 +47,7 @@ function ControleMenu({
   const [dfsAlgorithmsConsoleOuput, setdfsAlgorithmsConsoleOuput] = useState(
     [],
   );
+  const [dijkstrasAlgConsoleOuput, setdijkstrasAlgConsoleOuput] = useState([]);
 
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
@@ -60,11 +61,12 @@ function ControleMenu({
     setHeapSortConsoleOuput([]);
     setbfsAlgorithmsConsoleOuput([]);
     setdfsAlgorithmsConsoleOuput([]);
+    setdijkstrasAlgConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
   useEffect(() => {
-    if (isMounted.current) {
+    if (isMounted.current && LoggedMessage != "") {
       switch (Animation_name) {
         case "Stacks":
           setStacksConsoleOuput([...stacksConsoleOuput, " > " + LoggedMessage]);
@@ -111,6 +113,12 @@ function ControleMenu({
         case "Depth First Search":
           setdfsAlgorithmsConsoleOuput([
             ...dfsAlgorithmsConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+
+        case "Dijkstra's Alg":
+          setdijkstrasAlgConsoleOuput([
+            ...dijkstrasAlgConsoleOuput,
             " > " + LoggedMessage,
           ]);
       }
@@ -352,6 +360,29 @@ function ControleMenu({
           <div className="Console-Text">
             <ul className="list">
               {dfsAlgorithmsConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Dijkstra's Alg":
+      return (
+        <>
+          <GraphsMenu
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Random={Random}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {dijkstrasAlgConsoleOuput.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>

@@ -418,7 +418,6 @@ const HeapSortAnimations = ({
 
   //updates all the x and y values of each box in the array for proper displaying
   const updateAll = () => {
-    console.log(arr);
     //everything should happen if the array isnt empty
     if (arr.length > 0) {
       //Finds the starting x value postion for the array
@@ -538,7 +537,6 @@ const HeapSortAnimations = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-    console.log("hi");
     if (canvas) {
       canvas.height = height - 3;
       canvas.width = windowWidth - menuWidth;

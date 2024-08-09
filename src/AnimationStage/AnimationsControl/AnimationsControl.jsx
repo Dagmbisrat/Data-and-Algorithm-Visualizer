@@ -11,6 +11,7 @@ import MergeSortAnimations from "./AllAnimations/Sorting/MergeSortAnimations.jsx
 import HeapSortAnimations from "./AllAnimations/Sorting/HeapSortAnimations.jsx";
 import BreathFirstSearchAnimations from "./AllAnimations/Graphs/BreathFirstSearchAnimations.jsx";
 import DepthFirstSearchAnimations from "./AllAnimations/Graphs/DepthFirstSearchAnimations.jsx";
+import DijkstrasAlgAnimations from "./AllAnimations/Graphs/dijkstrasAlgAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -185,6 +186,19 @@ const Animations = ({
     case "Depth First Search":
       return (
         <DepthFirstSearchAnimations
+          speed={speed}
+          height={height}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Search={Sort}
+        />
+      );
+    case "Dijkstra's Alg":
+      return (
+        <DijkstrasAlgAnimations
           speed={speed}
           height={height}
           Random={Random}
