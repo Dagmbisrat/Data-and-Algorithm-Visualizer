@@ -12,6 +12,8 @@ import HeapSortAnimations from "./AllAnimations/Sorting/HeapSortAnimations.jsx";
 import BreathFirstSearchAnimations from "./AllAnimations/Graphs/BreathFirstSearchAnimations.jsx";
 import DepthFirstSearchAnimations from "./AllAnimations/Graphs/DepthFirstSearchAnimations.jsx";
 import DijkstrasAlgAnimations from "./AllAnimations/Graphs/dijkstrasAlgAnimations.jsx";
+import AStarAlgAniamtions from "./AllAnimations/Graphs/AStarAlgAnimations.jsx";
+import DefaultScreen from "./AllAnimations/Default/DefaultAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -210,8 +212,22 @@ const Animations = ({
         />
       );
 
+    case "A* Alg":
+      return (
+        <AStarAlgAniamtions
+          speed={speed}
+          height={height}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Search={Sort}
+        />
+      );
+
     default:
-      return <canvas className="DefaultCanvas" ref={canvasRef} />;
+      return <DefaultScreen />;
   }
 };
 export default Animations;

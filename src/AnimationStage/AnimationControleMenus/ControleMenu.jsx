@@ -5,6 +5,7 @@ import StacksMenu from "./AllAnimationMenus/SimpleDataTypes/StacksMenu.jsx";
 import QueuesMenu from "./AllAnimationMenus/SimpleDataTypes/QueuesMenu.jsx";
 import SortingMenu from "./AllAnimationMenus/Sorting/SortingMenu.jsx";
 import GraphsMenu from "./AllAnimationMenus/Graphs/GraphsMenu.jsx";
+import DefaultMenuScreen from "./AllAnimationMenus/Default/DefaultAnimationsMenu.jsx";
 
 function ControleMenu({
   Animation_name,
@@ -49,6 +50,8 @@ function ControleMenu({
   );
   const [dijkstrasAlgConsoleOuput, setdijkstrasAlgConsoleOuput] = useState([]);
 
+  const [aStarAlgConsoleOuput, setAStarAlgConsoleOuput] = useState([]);
+
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
     setStacksConsoleOuput([]);
@@ -62,6 +65,7 @@ function ControleMenu({
     setbfsAlgorithmsConsoleOuput([]);
     setdfsAlgorithmsConsoleOuput([]);
     setdijkstrasAlgConsoleOuput([]);
+    setAStarAlgConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
@@ -119,6 +123,11 @@ function ControleMenu({
         case "Dijkstra's Alg":
           setdijkstrasAlgConsoleOuput([
             ...dijkstrasAlgConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "A* Alg":
+          setAStarAlgConsoleOuput([
+            ...aStarAlgConsoleOuput,
             " > " + LoggedMessage,
           ]);
       }
@@ -390,12 +399,33 @@ function ControleMenu({
         </>
       );
 
+    case "A* Alg":
+      return (
+        <>
+          <GraphsMenu
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Random={Random}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {aStarAlgConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
     default:
       return (
         <>
-          <div>Controles menu</div>
-          <div>Builder</div>
-          <div>Console</div>
+          <DefaultMenuScreen />
         </>
       );
   }

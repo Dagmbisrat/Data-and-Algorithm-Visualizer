@@ -4,6 +4,9 @@
     justify-content: space-between;
 }
 .Console {
+    color: #cfcfcf;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
     border-bottom: 1px solid #000; /* Change color and thickness as needed */
     padding-bottom: 2px; /* Adjust padding to fit the content */
 }

@@ -7,13 +7,13 @@ const BreathFirstSearchAnimations = ({
   height,
   Random,
   Clear,
-  Input,
   menuWidth,
   Log,
   Search,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
+  const rootNode = 0;
   const maxArrsize = 10;
   const [isAnimating, setisAnimating] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -36,6 +36,7 @@ const BreathFirstSearchAnimations = ({
         x: getRandomNum(0, windowWidth - menuWidth),
         y: getRandomNum(0, height - 3),
       };
+      this.Shape = "ellipse";
     }
     Searched() {
       this.searched = true;
@@ -82,6 +83,7 @@ const BreathFirstSearchAnimations = ({
         data: {
           id: graph[0][i].data,
           color: graph[0][i].getColor(),
+          shape: graph[0][i].Shape,
         },
         position: { x: graph[0][i].position.x, y: graph[0][i].position.y },
       });
@@ -177,6 +179,7 @@ const BreathFirstSearchAnimations = ({
       let copy = new Nodes(node.data);
       copy.position = node.position;
       copy.searched = node.searched;
+      copy.Shape = node.Shape;
 
       tempGraph[0].push(copy);
     }
@@ -241,26 +244,13 @@ const BreathFirstSearchAnimations = ({
         const char = getRandomCharacter();
         if (!has(tempGraph[0], char)) {
           tempGraph[0].push(new Nodes(char));
+          if (i == rootNode) tempGraph[0][i].Shape = "star";
         } else {
           i--;
         }
       }
 
       tempGraph[1] = generateRandomSpanningTree(tempGraph[0]);
-
-      //givies a random adjacency list
-      // for (let i = 0; i < maxArrsize; i++) {
-      //   const randNumOfAdjacentNodes = getRandomNum(1, maxArrsize - 1);
-
-      //   for (let j = 0; j < randNumOfAdjacentNodes; j++) {
-      //     const char = tempGraph[0][getRandomNum(0, maxArrsize - 1)].data;
-      //     if (!has(tempGraph[1][i], char) && char != tempGraph[0][i].data) {
-      //       tempGraph[1][i].push(new Edge(char));
-      //     } else {
-      //       j--;
-      //     }
-      //   }
-      // }.
 
       console.log(tempGraph);
       setGraph(tempGraph);
@@ -292,8 +282,6 @@ const BreathFirstSearchAnimations = ({
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
       setisAnimating(true);
-
-      const rootNode = 0;
 
       const bfsTraversalList = bfs(rootNode)[0];
       const bfsEdgeTraversalList = bfs(rootNode)[1];
@@ -389,9 +377,16 @@ const BreathFirstSearchAnimations = ({
             selector: "node",
             style: {
               "background-color": "data(color)",
-              width: "30",
-              height: "30",
+              shape: "data(shape)",
+              width: "35",
+              height: "35",
               label: "data(id)",
+              "border-color": "black", // white outline
+              "border-width": "1px", // thickness of the outline
+              "border-style": "solid", // style of the outline
+              "text-halign": "center", // Horizontal alignment of the text
+              "text-valign": "center", // Vertical alignment of the text
+              "font-weight": "bold",
             },
           },
           {

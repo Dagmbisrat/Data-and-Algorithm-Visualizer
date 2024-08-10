@@ -535,6 +535,9 @@ const DijkstrasAlgAnimations = ({
               width: "30",
               height: "30",
               "background-color": "data(color)",
+              "border-color": "black", // white outline
+              "border-width": "1px", // thickness of the outline
+              "border-style": "solid", // style of the outline
             },
           },
           {

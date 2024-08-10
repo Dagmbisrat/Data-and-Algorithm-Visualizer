@@ -1,0 +1,10 @@
+.main {
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally (optional) */
+    padding-right: 180px;
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    height: 100%;
+    background-color: #272525;
+}

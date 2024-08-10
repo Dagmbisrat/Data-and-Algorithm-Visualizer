@@ -388,9 +388,15 @@ const DepthFirstSearchAnimations = ({
             selector: "node",
             style: {
               "background-color": "data(color)",
-              width: "30",
-              height: "30",
+              width: "35",
+              height: "35",
               label: "data(id)",
+              "border-color": "black", // white outline
+              "border-width": "1px", // thickness of the outline
+              "border-style": "solid", // style of the outline
+              "text-halign": "center", // Horizontal alignment of the text
+              "text-valign": "center", // Vertical alignment of the text
+              "font-weight": "bold",
             },
           },
           {

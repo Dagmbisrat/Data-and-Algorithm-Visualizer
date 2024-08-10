@@ -311,7 +311,7 @@ const AStarAlgAniamtions = ({
     return path.reverse();
   }
 
-  async function dijkstra(start, goal) {
+  async function aStar(start, goal) {
     return new Promise(async (resolve) => {
       // Initialization
       const openSet = new PriorityQueue();
@@ -488,7 +488,7 @@ const AStarAlgAniamtions = ({
             graph[0][targetNode].data,
         );
 
-        const answerArr = await dijkstra(rootNode, targetNode);
+        const answerArr = await aStar(rootNode, targetNode);
 
         console.log(graph[0]);
         console.log(answerArr);
@@ -586,6 +586,9 @@ const AStarAlgAniamtions = ({
               "text-margin-y": "20px", // Adjust this value to position the label
               "font-size": "12px",
               "font-weight": "bold",
+              "border-color": "black", // white outline
+              "border-width": "1px", // thickness of the outline
+              "border-style": "solid", // style of the outline
               label: function (ele) {
                 return ele.data("label") + "\n\n" + ele.data("id");
               },
@@ -600,6 +603,9 @@ const AStarAlgAniamtions = ({
               "text-margin-y": "45px", // Adjust this value to position the label
               "font-size": "12px",
               "font-weight": "bold",
+              "border-color": "black", // white outline
+              "border-width": "1px", // thickness of the outline
+              "border-style": "solid", // style of the outline
               label: function (ele) {
                 return (
                   ele.data("label") +

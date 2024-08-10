@@ -74,45 +74,46 @@ function Menu({ menuToggle, doAnimation }) {
   }, [menuToggle]);
 
   return (
-    <div
-      className="expandable-container"
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-    >
-      <div style={menuToggle ? { width: width } : { width: 0 }}>
-        <div
-          className="dropdown-menu"
-          style={menuToggle ? { width: width } : { width: 0 }}
-        >
-          {menuData.map((menuItem, index) => (
-            <div key={index} className="menu-item">
-              <div
-                className="menu-title"
-                onClick={() => handleMenuClick(index)}
-              >
-                {menuItem.title}
-              </div>
-              {activeMenu === index && menuItem.subMenu.length > 0 && (
-                <div className="submenu">
-                  {menuItem.subMenu.map((subItem, subIndex) => (
-                    <div
-                      key={subIndex}
-                      className="submenu-item"
-                      onClick={() => handleSubMenuClick(subItem)} // this is where the logiic of which animation should be passed goes
-                    >
-                      {subItem}
-                    </div>
-                  ))}
+    <>
+      <div
+        className="expandable-container"
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+      >
+        <div style={menuToggle ? { width: width } : { width: 0 }}>
+          <div
+            className="dropdown-menu"
+            style={menuToggle ? { width: width } : { width: 0 }}
+          >
+            {menuData.map((menuItem, index) => (
+              <div key={index} className="menu-item">
+                <div
+                  className="menu-title"
+                  onClick={() => handleMenuClick(index)}
+                >
+                  {menuItem.title}
                 </div>
-              )}
-            </div>
-          ))}
-          <div className="extra">extra</div>
+                {activeMenu === index && menuItem.subMenu.length > 0 && (
+                  <div className="submenu">
+                    {menuItem.subMenu.map((subItem, subIndex) => (
+                      <div
+                        key={subIndex}
+                        className="submenu-item"
+                        onClick={() => handleSubMenuClick(subItem)} // this is where the logiic of which animation should be passed goes
+                      >
+                        {subItem}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+        <div className="resize" onMouseDown={handleMouseDown}></div>
+        <Stage Animation_name={algAnimation} menuWidth={width} />
       </div>
-      <div className="resize" onMouseDown={handleMouseDown}></div>
-      <Stage Animation_name={algAnimation} menuWidth={width} />
-    </div>
+    </>
   );
 }
 

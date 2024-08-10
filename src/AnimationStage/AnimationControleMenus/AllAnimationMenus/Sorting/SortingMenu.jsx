@@ -32,31 +32,51 @@ function SortingMenu({
   return (
     <>
       <header className="Menubackground">
-        <input
-          className="input"
-          type="number"
-          maxLength="1"
-          id="input"
-          value={Input}
-          onChange={handleInputChange}
-        />
-        <button onClick={Add}> Add </button>
-        <button onClick={Remove}> Remove </button>
-        <button onClick={Random}> Random </button>
-        <button onClick={Clear}> Clear</button>
-        <button onClick={Sort}> Sort</button>
-        <div className="slidecontainer">
-          <p>Speed</p>
+        <div class="set">
           <input
-            id="slider"
-            className="slider"
-            type="range"
-            min="1"
-            max="100"
-            value={speed}
-            onChange={handleSpeedChange}
-            style={{ width: "100%" }}
+            className="input"
+            type="number"
+            maxLength="1"
+            id="input"
+            value={Input}
+            onChange={handleInputChange}
           />
+          <button class="random-button" onClick={Add}>
+            <span class="random-icon">⊕</span>Add
+          </button>
+          <button class="random-button" onClick={Remove}>
+            <span class="random-icon">&#8854;</span>
+            Remove
+          </button>
+          <button class="random-button" onClick={Random}>
+            <span class="random-icon">⇄</span>
+            Randomize
+          </button>
+          <button class="clear-button" onClick={Clear}>
+            <span class="clear-icon">⌫</span>
+            Clear
+          </button>
+        </div>
+        <div class="set">
+          <button class="sort-button" onClick={Sort}>
+            <span class="play-icon">▶</span>
+            Sort
+          </button>
+          <div className="slidecontainer">
+            <div class="slider-container">
+              <label for="speed-slider">Speed</label>
+              <input
+                id="speed-slider"
+                class="slider"
+                type="range"
+                min="1"
+                max="100"
+                value={speed}
+                onChange={handleSpeedChange}
+                style={{ width: "100%" }}
+              />
+            </div>
+          </div>
         </div>
       </header>
     </>

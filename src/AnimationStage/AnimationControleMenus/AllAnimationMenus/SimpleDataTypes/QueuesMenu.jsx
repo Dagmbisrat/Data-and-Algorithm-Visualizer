@@ -7,7 +7,6 @@ function QueuesMenu({
   UnQueue,
   Clear,
   updateSpeed,
-  speed,
   Input,
   updateInput,
 }) {
@@ -30,30 +29,29 @@ function QueuesMenu({
   return (
     <>
       <header className="Menubackground">
-        <input
-          className="input"
-          type="number"
-          maxLength="1"
-          id="input"
-          value={Input}
-          onChange={handleInputChange}
-        />
-        <button onClick={Queue}> Enqueue </button>
-        <button onClick={UnQueue}> Dequeue </button>
-        <button onClick={Clear}> Clear</button>
-        <div className="slidecontainer">
-          {/* <p>Speed</p> */}
-          {/* <input
-            id="slider"
-            className="slider"
-            type="range"
-            min="1"
-            max="100"
-            value={speed}
-            onChange={handleSpeedChange}
-            style={{ width: "100%" }}
-          /> */}
-          {/* <p>{speed}</p> */}
+        <div class="set">
+          <input
+            className="input"
+            type="number"
+            maxLength="1"
+            id="input"
+            value={Input}
+            onChange={handleInputChange}
+          />
+          <button class="button" onClick={Queue}>
+            <span class="icon">⊕</span>
+            EnQueue
+          </button>
+          <button class="button" onClick={UnQueue}>
+            <span class="icon">&#8854;</span>
+            DeQueue
+          </button>
+        </div>
+        <div class="set">
+          <button class="button" onClick={Clear}>
+            <span class="icon">⌫</span>
+            Clear
+          </button>
         </div>
       </header>
     </>
