@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import cytoscape from "cytoscape";
-import { constant, endsWith, template } from "lodash";
 
 const AStarAlgAniamtions = ({
   speed,
