@@ -21,9 +21,8 @@ const BreathFirstSearchAnimations = ({
     [],
     new Array(maxArrsize).fill().map(() => []),
   ]);
-
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
-
+  const rootShape = "star";
   const normalColor = "gray";
   const edgeNormColor = "white";
 
@@ -244,7 +243,7 @@ const BreathFirstSearchAnimations = ({
         const char = getRandomCharacter();
         if (!has(tempGraph[0], char)) {
           tempGraph[0].push(new Nodes(char));
-          if (i == rootNode) tempGraph[0][i].Shape = "star";
+          if (i == rootNode) tempGraph[0][i].Shape = rootShape;
         } else {
           i--;
         }

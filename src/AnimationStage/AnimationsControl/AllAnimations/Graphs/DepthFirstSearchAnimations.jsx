@@ -7,7 +7,6 @@ const DepthFirstSearchAnimations = ({
   height,
   Random,
   Clear,
-  Input,
   menuWidth,
   Log,
   Search,
@@ -21,9 +20,9 @@ const DepthFirstSearchAnimations = ({
     [],
     new Array(maxArrsize).fill().map(() => []),
   ]);
-
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
-
+  const rootNode = 0;
+  const rootShape = "star";
   const normalColor = "gray";
   const edgeNormColor = "white";
 
@@ -36,6 +35,7 @@ const DepthFirstSearchAnimations = ({
         x: getRandomNum(0, windowWidth - menuWidth),
         y: getRandomNum(0, height - 3),
       };
+      this.Shape = "ellipse";
     }
     Searched() {
       this.searched = true;
@@ -82,6 +82,7 @@ const DepthFirstSearchAnimations = ({
         data: {
           id: graph[0][i].data,
           color: graph[0][i].getColor(),
+          shape: graph[0][i].Shape,
         },
         position: { x: graph[0][i].position.x, y: graph[0][i].position.y },
       });
@@ -177,6 +178,7 @@ const DepthFirstSearchAnimations = ({
       let copy = new Nodes(node.data);
       copy.position = node.position;
       copy.searched = node.searched;
+      copy.Shape = node.Shape;
 
       tempGraph[0].push(copy);
     }
@@ -240,26 +242,13 @@ const DepthFirstSearchAnimations = ({
         const char = getRandomCharacter();
         if (!has(tempGraph[0], char)) {
           tempGraph[0].push(new Nodes(char));
+          if (i == rootNode) tempGraph[0][i].Shape = rootShape;
         } else {
           i--;
         }
       }
 
       tempGraph[1] = generateRandomSpanningTree(tempGraph[0]);
-
-      //givies a random adjacency list
-      // for (let i = 0; i < maxArrsize; i++) {
-      //   const randNumOfAdjacentNodes = getRandomNum(1, maxArrsize - 1);
-
-      //   for (let j = 0; j < randNumOfAdjacentNodes; j++) {
-      //     const char = tempGraph[0][getRandomNum(0, maxArrsize - 1)].data;
-      //     if (!has(tempGraph[1][i], char) && char != tempGraph[0][i].data) {
-      //       tempGraph[1][i].push(new Edge(char));
-      //     } else {
-      //       j--;
-      //     }
-      //   }
-      // }.
 
       console.log(tempGraph);
       setGraph(tempGraph);
@@ -291,8 +280,6 @@ const DepthFirstSearchAnimations = ({
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
       setisAnimating(true);
-
-      const rootNode = 0;
 
       const dfsTraversalList = dfs(rootNode)[0];
       const dfsEdgeTraversalList = dfs(rootNode)[1];
@@ -388,6 +375,7 @@ const DepthFirstSearchAnimations = ({
             selector: "node",
             style: {
               "background-color": "data(color)",
+              shape: "data(shape)",
               width: "35",
               height: "35",
               label: "data(id)",
