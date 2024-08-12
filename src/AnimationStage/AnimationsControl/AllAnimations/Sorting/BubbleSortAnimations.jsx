@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { cloneWith } from "lodash";
 
 const BubbleSortAnimations = ({
   speed,
@@ -12,6 +13,7 @@ const BubbleSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -47,6 +49,10 @@ const BubbleSortAnimations = ({
       this.sorted = true;
     }
 
+    setUnSorted() {
+      this.sorted = false;
+    }
+
     equals(box) {
       return this.value == box.value && this.x == box.x && this.y == box.y;
     }
@@ -62,6 +68,20 @@ const BubbleSortAnimations = ({
       context.font = "14px Arial";
       context.fillText(this.value, this.x + 16, this.y + 20);
     }
+  }
+
+  //sends if its animiting
+  const sendisAnimating = () => {
+    setAnimating(isAnimating);
+  };
+
+  function clear() {
+    return new Promise((resolve) => {
+      for (const box of arr) {
+        box.setUnSorted();
+      }
+      resolve(setArr(arr));
+    });
   }
 
   //Animates comparing two box's
@@ -164,6 +184,9 @@ const BubbleSortAnimations = ({
   }
 
   async function play() {
+    //clear the of any colors before sorting
+    await clear();
+
     setisAnimating(true); //first set animating to true
     let n = arr.length;
     for (let i = 0; i < n - 1; i++) {
@@ -338,6 +361,7 @@ const BubbleSortAnimations = ({
 
   //handles the resize of the cavas when there is a change in the height
   useEffect(() => {
+    sendisAnimating();
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     if (canvas) {

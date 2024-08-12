@@ -13,6 +13,55 @@ header {
     border-bottom: 1px solid #232323; /* Add border for outline */
 }
 
+.right-buttons {
+    align-items: center;
+    display: flex;
+    margin-right: 10px;
+}
+.home-button {
+    background-color: #413f3f;
+    color: #d1cdcd;
+    border: none;
+    padding: 0px 17px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    height: fit-content;
+    margin-bottom: 2px;
+    border-bottom: 3px solid #232323; /* Add border for outline */
+}
+
+.home-button:hover {
+    background: #454545;
+}
+
+.home-icon {
+    font-size: 30px;
+    margin-right: 5px;
+}
+.home-icon:hover {
+    transform: scale(0.9);
+}
+
+.load-icon {
+    font-size: 30px;
+    margin-right: 5px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.home-button:focus {
+    outline: none;
+}
+
 .tittle-button {
     font-weight: bold;
     font-family: Arial, sans-serif;
@@ -35,8 +84,8 @@ header {
 .gitIMG {
     height: 30px;
     margin-right: 40px;
-    padding-right: 10px;
-    padding-left: 10px;
+    padding-right: 15px;
+    padding-left: 15px;
     width: 25px;
     transform: scale(1.1);
     overflow: auto;
@@ -45,4 +94,5 @@ header {
 .gitIMG:hover {
     transform: scale(1);
     opacity: 1;
+    background: #454545;
 }

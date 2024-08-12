@@ -12,6 +12,7 @@ const HeapSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -38,6 +39,8 @@ const HeapSortAnimations = ({
       this.value = value;
       this.display = true;
       this.sorted = false;
+
+      this.setUnSorted();
     }
     setX(x) {
       this.x = x;
@@ -53,6 +56,9 @@ const HeapSortAnimations = ({
     }
     setSorted() {
       this.sorted = true;
+    }
+    setUnSorted() {
+      this.sorted = false;
     }
     setDisplay(value) {
       this.display = value;
@@ -99,6 +105,21 @@ const HeapSortAnimations = ({
         context.fillText(this.value, this.x - 7, this.y + 4);
       }
     }
+  }
+
+  //sends if its animiting
+  const sendisAnimating = () => {
+    setAnimating(isAnimating);
+  };
+
+  //clear the green
+  function clear() {
+    return new Promise((resolve) => {
+      for (const box of arr) {
+        box.setUnSorted();
+      }
+      resolve(setArr(arr));
+    });
   }
 
   //helper function that returns an array of copied box's
@@ -348,6 +369,8 @@ const HeapSortAnimations = ({
   }
 
   async function play() {
+    //clear all green before starting
+    clear();
     setisAnimating(true);
 
     //Build a max heap
@@ -535,6 +558,7 @@ const HeapSortAnimations = ({
 
   //handles the resize of the cavas when there is a change in the height
   useEffect(() => {
+    sendisAnimating();
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     if (canvas) {

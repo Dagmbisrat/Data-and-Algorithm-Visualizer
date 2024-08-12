@@ -161,6 +161,23 @@ const DepthFirstSearchAnimations = ({
     return characters.charAt(Math.floor(Math.random() * characters.length));
   }
 
+  //clear the graph
+  function clear() {
+    if (graph[0].length) {
+      for (const nodes of graph[0]) {
+        nodes.UnSearched();
+      }
+      for (const list of graph[1]) {
+        for (const edges of list) {
+          edges.UnSearched();
+        }
+      }
+      setGraph(copyGraph(graph));
+    } else {
+      Log("Cannot clear empty graph!");
+    }
+  }
+
   //returns the index of the first found edge or  node with the data that is equal to char
   function get(array, char) {
     for (let i = 0; i < array.length; i++) {
@@ -259,73 +276,67 @@ const DepthFirstSearchAnimations = ({
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      if (graph[0].length) {
-        for (const nodes of graph[0]) {
-          nodes.UnSearched();
-        }
-        for (const list of graph[1]) {
-          for (const edges of list) {
-            edges.UnSearched();
-          }
-        }
-        setGraph(copyGraph(graph));
-        Log("Cleard!");
-      } else {
-        Log("Cannot unserch empty graph!");
-      }
+      clear();
     }
   }, [Clear]);
 
   //handels any sorting
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      setisAnimating(true);
+      if (graph[0].length != 0) {
+        setisAnimating(true);
 
-      const dfsTraversalList = dfs(rootNode)[0];
-      const dfsEdgeTraversalList = dfs(rootNode)[1];
-      console.log(dfs(rootNode));
+        //clear the graph
+        clear();
 
-      //set visited helper function
-      function setVisited(index, edge) {
-        return new Promise((resolve) => {
-          setTimeout(
-            () => {
-              graph[0][index].Searched();
+        const dfsTraversalList = dfs(rootNode)[0];
+        const dfsEdgeTraversalList = dfs(rootNode)[1];
+        console.log(dfs(rootNode));
 
-              setGraph(copyGraph(graph));
-              resolve();
-            },
-            mapNumber(speed, 100, 1, 750, 2000),
-          );
-        });
-      }
+        //set visited helper function
+        function setVisited(index, edge) {
+          return new Promise((resolve) => {
+            setTimeout(
+              () => {
+                graph[0][index].Searched();
 
-      //color the edge helper function
-      function colorEdge(set) {
-        return new Promise((resolve) => {
-          let i = get(graph[1][set[0]], graph[0][set[1]].data);
-          graph[1][set[0]][i].Searched();
-          setGraph(copyGraph(graph));
-          i = get(graph[1][set[1]], graph[0][set[0]].data);
-          graph[1][set[1]][i].Searched();
-          setGraph(copyGraph(graph));
-          resolve();
-        });
-      }
-
-      // Function that processes each element in the array with a delay
-      async function processArrayWithDelay() {
-        await setVisited(dfsTraversalList[0]); //visit the node
-        for (let i = 1; i < dfsTraversalList.length; i++) {
-          await setVisited(dfsTraversalList[i]); //visit the node
-          await colorEdge(dfsEdgeTraversalList[i - 1]);
+                setGraph(copyGraph(graph));
+                resolve();
+              },
+              mapNumber(speed, 100, 1, 750, 2000),
+            );
+          });
         }
 
-        Log("Searchd!");
-        setisAnimating(false);
-      }
+        //color the edge helper function
+        function colorEdge(set) {
+          return new Promise((resolve) => {
+            let i = get(graph[1][set[0]], graph[0][set[1]].data);
+            graph[1][set[0]][i].Searched();
+            setGraph(copyGraph(graph));
+            i = get(graph[1][set[1]], graph[0][set[0]].data);
+            graph[1][set[1]][i].Searched();
+            setGraph(copyGraph(graph));
+            resolve();
+          });
+        }
 
-      processArrayWithDelay();
+        // Function that processes each element in the array with a delay
+        async function processArrayWithDelay() {
+          await setVisited(dfsTraversalList[0]); //visit the node
+          for (let i = 1; i < dfsTraversalList.length; i++) {
+            await setVisited(dfsTraversalList[i]); //visit the node
+            await colorEdge(dfsEdgeTraversalList[i - 1]);
+          }
+
+          Log("Searchd!");
+          setisAnimating(false);
+        }
+
+        processArrayWithDelay();
+      } else {
+        Log("Error: Cannot search empty graph!");
+      }
     }
   }, [Search]);
 

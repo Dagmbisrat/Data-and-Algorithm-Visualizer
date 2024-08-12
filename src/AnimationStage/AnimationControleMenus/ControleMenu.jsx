@@ -19,6 +19,7 @@ function ControleMenu({
   LoggedMessage,
   Sort,
   Random,
+  isAnimating,
 }) {
   const isMounted = useRef(false);
 
@@ -243,6 +244,7 @@ function ControleMenu({
             updateInput={updateInput_}
             Sort={Sort}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">
@@ -268,6 +270,7 @@ function ControleMenu({
             updateInput={updateInput_}
             Sort={Sort}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">
@@ -293,6 +296,7 @@ function ControleMenu({
             updateInput={updateInput_}
             Sort={Sort}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">
@@ -318,6 +322,7 @@ function ControleMenu({
             updateInput={updateInput_}
             Sort={Sort}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">

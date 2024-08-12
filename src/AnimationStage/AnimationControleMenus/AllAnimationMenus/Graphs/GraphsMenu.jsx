@@ -3,20 +3,9 @@ import PropTypes from "prop-types";
 import React, { useState } from "react";
 
 function GraphsMenu({ Clear, updateSpeed, speed, updateInput, Sort, Random }) {
-  const largestAcceptedInput = 99;
   const handleSpeedChange = (event) => {
     // console.log("handleSpeedChange");
     updateSpeed(event.target.value);
-  };
-
-  const handleInputChange = (event) => {
-    // console.log("handleInputChange");
-    if (
-      event.target.value <= largestAcceptedInput &&
-      event.target.value >= -largestAcceptedInput
-    ) {
-      updateInput(event.target.value);
-    }
   };
 
   return (

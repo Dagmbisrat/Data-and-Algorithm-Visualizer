@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import cytoscape from "cytoscape";
-import { constant, endsWith, template } from "lodash";
 
 const DijkstrasAlgAnimations = ({
   speed,
@@ -139,6 +138,23 @@ const DijkstrasAlgAnimations = ({
 
     return elements;
   };
+
+  function clear(all) {
+    if (graph[0].length) {
+      for (const nodes of graph[0]) {
+        nodes.UnSearched();
+        if (all) nodes.label = "";
+      }
+      for (const list of graph[1]) {
+        for (const edges of list) {
+          edges.setColor(edgeNormColor);
+        }
+      }
+      setGraph(copyGraph(graph));
+    } else {
+      Log("Cannot clear empty graph!");
+    }
+  }
 
   function has(array, char) {
     return array.some((obj) => obj.data === char);
@@ -314,7 +330,7 @@ const DijkstrasAlgAnimations = ({
           const newDistance = distances[currentNode] + weight;
 
           //color the neighbor edge since the path is
-          await colorEdge([currentNode, node], "red", false);
+          await colorEdge([currentNode, node], "red", true);
 
           // If a shorter path to the neighbor is found
           if (newDistance < distances[node]) {
@@ -327,6 +343,8 @@ const DijkstrasAlgAnimations = ({
             pq.enqueue(newDistance, node);
           }
         }
+        //clear the graph
+        clear(false);
       }
 
       // Reconstruct the shortest path from source to target
@@ -416,72 +434,65 @@ const DijkstrasAlgAnimations = ({
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      if (graph[0].length) {
-        for (const nodes of graph[0]) {
-          nodes.UnSearched();
-          nodes.label = "";
-        }
-        for (const list of graph[1]) {
-          for (const edges of list) {
-            edges.setColor(edgeNormColor);
-          }
-        }
-        setGraph(copyGraph(graph));
-        Log("Cleard!");
-      } else {
-        Log("Cannot unserch empty graph!");
-      }
+      clear(true);
     }
   }, [Clear]);
 
   //handels any sorting
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      setisAnimating(true);
+      if (graph[0].length != 0) {
+        setisAnimating(true);
 
-      //set visited helper function
-      function setVisited(index) {
-        return new Promise((resolve) => {
-          setTimeout(
-            () => {
-              graph[0][index].Searched();
+        //clear the graph first
+        clear(true);
 
-              setGraph(copyGraph(graph));
-              resolve();
-            },
-            mapNumber(speed, 100, 1, 750, 2000),
-          );
-        });
-      }
+        //set visited helper function
+        function setVisited(index) {
+          return new Promise((resolve) => {
+            setTimeout(
+              () => {
+                graph[0][index].Searched();
 
-      // Function that processes each element in the array with a delay
-      async function processArrayWithDelay() {
-        Log(
-          "Fiding path from " +
-            graph[0][rootNode].data +
-            " to " +
-            graph[0][targetNode].data,
-        );
-
-        const answerArr = await dijkstra(rootNode, targetNode);
-
-        console.log(answerArr[1]);
-        const traversalList = answerArr[0];
-        const edgeTraversalList = answerArr[1];
-
-        await setVisited(traversalList[0]); //visit the node
-        for (let i = 1; i < traversalList.length; i++) {
-          await setVisited(traversalList[i]); //visit the node
-          await colorEdge(edgeTraversalList[i - 1], "green", true);
+                setGraph(copyGraph(graph));
+                resolve();
+              },
+              mapNumber(speed, 100, 1, 750, 2000),
+            );
+          });
         }
 
-        Log(
-          "Path Found with the length of " + graph[0][targetNode].label + "!",
-        );
-        setisAnimating(false);
-      }
+        // Function that processes each element in the array with a delay
+        async function processArrayWithDelay() {
+          Log(
+            "Fiding path from " +
+              graph[0][rootNode].data +
+              " to " +
+              graph[0][targetNode].data,
+          );
 
-      processArrayWithDelay();
+          const answerArr = await dijkstra(rootNode, targetNode);
+
+          console.log(answerArr[1]);
+          const traversalList = answerArr[0];
+          const edgeTraversalList = answerArr[1];
+
+          await setVisited(traversalList[0]); //visit the node
+          for (let i = 1; i < traversalList.length; i++) {
+            await setVisited(traversalList[i]); //visit the node
+            await colorEdge(edgeTraversalList[i - 1], "green", true);
+          }
+
+          Log(
+            "Path Found with the length of " + graph[0][targetNode].label + "!",
+          );
+          setisAnimating(false);
+        }
+
+        processArrayWithDelay();
+      } else {
+        Log("Error: Cannot search empty graph!");
+      }
     }
   }, [Search]);
 

@@ -15,6 +15,7 @@ function Stage({ Animation_name, menuWidth }) {
   const [loggedMessage, setloggedMessage] = useState("");
   const [doSort, setDoSort] = useState(false);
   const [doRandom, setDoRandom] = useState(false);
+  const [isAnimating, setisAnimating] = useState(false);
 
   const handleMouseDown = (event) => {
     setMouseDown(true);
@@ -60,6 +61,9 @@ function Stage({ Animation_name, menuWidth }) {
   const log = (message) => {
     setloggedMessage(message);
   };
+  const setAnimating = (isAnimating) => {
+    setisAnimating(isAnimating);
+  };
 
   useEffect(() => {
     setloggedMessage("");
@@ -85,6 +89,7 @@ function Stage({ Animation_name, menuWidth }) {
             Log={log}
             Random={doRandom}
             Sort={doSort}
+            setAnimating={setAnimating}
           />
         </div>
         <div className="resize-bar" onMouseDown={handleMouseDown}></div>
@@ -101,6 +106,7 @@ function Stage({ Animation_name, menuWidth }) {
         LoggedMessage={loggedMessage}
         Sort={sort}
         Random={random}
+        isAnimating={isAnimating}
       />
     </div>
   );

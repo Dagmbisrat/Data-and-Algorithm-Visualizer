@@ -216,6 +216,27 @@ const AStarAlgAniamtions = ({
     return characters.charAt(Math.floor(Math.random() * characters.length));
   }
 
+  //clears the graph
+  function clear(all) {
+    if (graph[0].length) {
+      for (const nodes of graph[0]) {
+        nodes.UnSearched();
+        if (all) {
+          nodes.label = "";
+          nodes.Heuristic = "";
+        }
+      }
+      for (const list of graph[1]) {
+        for (const edges of list) {
+          edges.setColor(edgeNormColor);
+        }
+      }
+      setGraph(copyGraph(graph));
+    } else {
+      Log("Cannot clear empty graph!");
+    }
+  }
+
   //returns the index of the first found edge or  node with the data that is equal to char
   function get(array, char) {
     for (let i = 0; i < array.length; i++) {
@@ -298,7 +319,7 @@ const AStarAlgAniamtions = ({
           2,
         ),
     );
-    return Math.ceil(result / 100);
+    return Math.ceil(result / 60);
   }
 
   function reconstructPath(cameFrom, current) {
@@ -353,7 +374,7 @@ const AStarAlgAniamtions = ({
           const tentativeGScore = gScore[current] + weight;
 
           //color the neighbor edge since the path is
-          await colorEdge([current, neighborNode], "red", false);
+          await colorEdge([current, neighborNode], "red", true);
 
           if (tentativeGScore < gScore[neighborNode]) {
             cameFrom[neighborNode] = current;
@@ -367,6 +388,8 @@ const AStarAlgAniamtions = ({
             openSet.enqueue(fScore[neighborNode], neighborNode);
           }
         }
+        //clear the graph
+        clear(false);
       }
     });
   }
@@ -439,74 +462,64 @@ const AStarAlgAniamtions = ({
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      if (graph[0].length) {
-        for (const nodes of graph[0]) {
-          nodes.UnSearched();
-          nodes.label = "";
-          nodes.Heuristic = "";
-        }
-        for (const list of graph[1]) {
-          for (const edges of list) {
-            edges.setColor(edgeNormColor);
-          }
-        }
-        setGraph(copyGraph(graph));
-        Log("Cleard!");
-      } else {
-        Log("Cannot unserch empty graph!");
-      }
+      clear(true);
     }
   }, [Clear]);
 
   //handels any sorting
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      setisAnimating(true);
+      if (graph[0].length != 0) {
+        setisAnimating(true);
 
-      //set visited helper function
-      function setVisited(index) {
-        return new Promise((resolve) => {
-          setTimeout(
-            () => {
-              graph[0][index].Searched();
+        //clear the graph
+        clear(true);
 
-              setGraph(copyGraph(graph));
-              resolve();
-            },
-            mapNumber(speed, 100, 1, 750, 2000),
-          );
-        });
-      }
+        //set visited helper function
+        function setVisited(index) {
+          return new Promise((resolve) => {
+            setTimeout(
+              () => {
+                graph[0][index].Searched();
 
-      // Function that processes each element in the array with a delay
-      async function processArrayWithDelay() {
-        Log(
-          "Fiding path from " +
-            graph[0][rootNode].data +
-            " to " +
-            graph[0][targetNode].data,
-        );
-
-        const answerArr = await aStar(rootNode, targetNode);
-
-        console.log(graph[0]);
-        console.log(answerArr);
-        const traversalList = answerArr[0];
-        const edgeTraversalList = answerArr[1];
-
-        await setVisited(traversalList[0]); //visit the node
-        for (let i = 1; i < traversalList.length; i++) {
-          await setVisited(traversalList[i]); //visit the node
-          await colorEdge(edgeTraversalList[i - 1], "green", true);
+                setGraph(copyGraph(graph));
+                resolve();
+              },
+              mapNumber(speed, 100, 1, 750, 2000),
+            );
+          });
         }
 
-        Log(
-          "Path Found with the length of " + graph[0][targetNode].label + "!",
-        );
-        setisAnimating(false);
-      }
+        // Function that processes each element in the array with a delay
+        async function processArrayWithDelay() {
+          Log(
+            "Fiding path from " +
+              graph[0][rootNode].data +
+              " to " +
+              graph[0][targetNode].data,
+          );
 
-      processArrayWithDelay();
+          const answerArr = await aStar(rootNode, targetNode);
+
+          const traversalList = answerArr[0];
+          const edgeTraversalList = answerArr[1];
+
+          await setVisited(traversalList[0]); //visit the node
+          for (let i = 1; i < traversalList.length; i++) {
+            await setVisited(traversalList[i]); //visit the node
+            await colorEdge(edgeTraversalList[i - 1], "green", true);
+          }
+
+          Log(
+            "Path Found with the length of " + graph[0][targetNode].label + "!",
+          );
+          setisAnimating(false);
+        }
+
+        processArrayWithDelay();
+      } else {
+        Log("Error: Cannot search empty graph!");
+      }
     }
   }, [Search]);
 

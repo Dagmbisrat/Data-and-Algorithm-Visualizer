@@ -12,6 +12,7 @@ const InsertionSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -51,7 +52,9 @@ const InsertionSortAnimations = ({
     setSorted() {
       this.sorted = true;
     }
-
+    setUnSorted() {
+      this.sorted = false;
+    }
     equals(box) {
       return this.value == box.value && this.x == box.x && this.y == box.y;
     }
@@ -89,6 +92,20 @@ const InsertionSortAnimations = ({
       context.font = "16px Arial";
       context.fillText("Key", x + 9, y + (keyBoxLengthAndWidth + space));
     }
+  }
+
+  //sends if its animiting
+  const sendisAnimating = () => {
+    setAnimating(isAnimating);
+  };
+
+  function clear() {
+    return new Promise((resolve) => {
+      for (const box of arr) {
+        box.setUnSorted();
+      }
+      resolve(setArr(arr));
+    });
   }
 
   //Animates comparing two box's
@@ -349,6 +366,8 @@ const InsertionSortAnimations = ({
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
+    await clear();
+
     setisAnimating(true); //first set animating to true
 
     let tempArr = arr;
@@ -518,6 +537,7 @@ const InsertionSortAnimations = ({
 
   // chages the windowWidth when window width changes
   useEffect(() => {
+    sendisAnimating();
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -533,6 +553,7 @@ const InsertionSortAnimations = ({
 
   //Updates Is mounted when after compleation of mountings
   useEffect(() => {
+    sendisAnimating();
     isMounted.current = true;
     return () => {
       isMounted.current = false;
@@ -541,6 +562,8 @@ const InsertionSortAnimations = ({
 
   //handles the resize of the cavas when there is a change in the height
   useEffect(() => {
+    sendisAnimating();
+
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     if (canvas) {

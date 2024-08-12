@@ -27,6 +27,7 @@ const Animations = ({
   Log,
   Random,
   Sort,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -122,6 +123,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          setAnimating={setAnimating}
         />
       );
 
@@ -138,6 +140,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          setAnimating={setAnimating}
         />
       );
 
@@ -154,6 +157,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          setAnimating={setAnimating}
         />
       );
 
@@ -170,6 +174,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          setAnimating={setAnimating}
         />
       );
     case "Breath First Search":

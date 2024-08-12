@@ -1,6 +1,6 @@
 import "./SortingMenu.css";
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function SortingMenu({
   Add,
@@ -12,8 +12,10 @@ function SortingMenu({
   updateInput,
   Sort,
   Random,
+  isAnimating,
 }) {
   const largestAcceptedInput = 99;
+
   const handleSpeedChange = (event) => {
     // console.log("handleSpeedChange");
     updateSpeed(event.target.value);
@@ -59,8 +61,12 @@ function SortingMenu({
         </div>
         <div class="set">
           <button class="sort-button" onClick={Sort}>
-            <span class="play-icon">▶</span>
-            Sort
+            {!isAnimating ? (
+              <span class="play-icon">▶</span>
+            ) : (
+              <span class="play-icon">▐▐</span>
+            )}
+            {!isAnimating ? "Sort" : "Pause"}
           </button>
           <div className="slidecontainer">
             <div class="slider-container">

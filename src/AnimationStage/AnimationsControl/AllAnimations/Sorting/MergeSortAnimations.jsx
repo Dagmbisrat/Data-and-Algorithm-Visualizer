@@ -12,6 +12,7 @@ const MergeSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -35,8 +36,8 @@ const MergeSortAnimations = ({
   class Box {
     constructor(value) {
       this.value = value;
-      this.sorted = false;
       this.display = true;
+      this.setUnSorted();
     }
     setX(x) {
       this.x = x;
@@ -56,6 +57,10 @@ const MergeSortAnimations = ({
 
     setSorted() {
       this.sorted = true;
+    }
+
+    setUnSorted() {
+      this.sorted = false;
     }
 
     equals(box) {
@@ -80,6 +85,21 @@ const MergeSortAnimations = ({
         );
       }
     }
+  }
+
+  //sends if its animiting
+  const sendisAnimating = () => {
+    setAnimating(isAnimating);
+  };
+
+  //clear the green
+  function clear() {
+    return new Promise((resolve) => {
+      for (const box of arr) {
+        box.setUnSorted();
+      }
+      resolve(setArr(arr));
+    });
   }
 
   //help function that draws the arrayStack
@@ -443,6 +463,9 @@ const MergeSortAnimations = ({
   //function that plays the animation
   async function play(arrayStack) {
     if (arrayStack.length > 0) {
+      //set to not green
+      clear();
+
       setisAnimating(true); //first set animating to true
 
       await mergeSort(arr, arrayStack);
@@ -586,7 +609,7 @@ const MergeSortAnimations = ({
 
   //handels any sorting
   useEffect(() => {
-    //make shure it dosent run on start
+    //make shure it dosent run on mount
     // check if its alredy animation
     if (isMounted.current && !isAnimating) {
       if (arr.length > 0) {
@@ -600,6 +623,8 @@ const MergeSortAnimations = ({
       }
       if (arr.length == 1) {
         arr[0].setSorted();
+      } else {
+        Log("Error: Cannot Sort an Empty Array");
       }
     }
   }, [Sort]);
@@ -638,6 +663,7 @@ const MergeSortAnimations = ({
 
   //handles the resize of the cavas when there is a change in the height
   useEffect(() => {
+    sendisAnimating();
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
     if (canvas) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./Header/Heder.jsx";
 import Menu from "./Menu/Menu.jsx";
 

@@ -9,9 +9,14 @@ const menuData = [
     subMenu: ["Stacks", "Queues", "Stacks-linkedList", "Queues-linkedList"],
   },
   {
+    title: "Searching Algorithms",
+    subMenu: ["Linear Search", "Binary Search"],
+  },
+  {
     title: "Sorting",
     subMenu: ["Bubble Sort", "Insertion Sort", "Merge Sort", "Heap Sort"],
   },
+
   {
     title: "Graph Algorithms",
     subMenu: [
@@ -20,10 +25,6 @@ const menuData = [
       "Dijkstra's Alg",
       "A* Alg",
     ],
-  },
-  {
-    title: "Divide and Conquer",
-    subMenu: [],
   },
   {
     title: "Dynamic Programming",
