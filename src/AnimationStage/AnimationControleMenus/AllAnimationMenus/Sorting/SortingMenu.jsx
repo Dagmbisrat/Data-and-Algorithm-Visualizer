@@ -62,6 +62,7 @@ function SortingMenu({
         <div class="set">
           <button class="sort-button" onClick={Sort}>
             <span class="play-icon">▶</span>
+            Sort
             {/* {!isAnimating ? (
               <span class="play-icon">▶</span>
             ) : (
