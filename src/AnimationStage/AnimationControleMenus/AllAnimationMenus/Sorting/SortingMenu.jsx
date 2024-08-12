@@ -61,12 +61,13 @@ function SortingMenu({
         </div>
         <div class="set">
           <button class="sort-button" onClick={Sort}>
-            {!isAnimating ? (
+            <span class="play-icon">▶</span>
+            {/* {!isAnimating ? (
               <span class="play-icon">▶</span>
             ) : (
               <span class="play-icon">▐▐</span>
             )}
-            {!isAnimating ? "Sort" : "Pause"}
+            {!isAnimating ? "Sort" : "Pause"} */}
           </button>
           <div className="slidecontainer">
             <div class="slider-container">
