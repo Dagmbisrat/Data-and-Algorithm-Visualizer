@@ -14,6 +14,8 @@ import DepthFirstSearchAnimations from "./AllAnimations/Graphs/DepthFirstSearchA
 import DijkstrasAlgAnimations from "./AllAnimations/Graphs/dijkstrasAlgAnimations.jsx";
 import AStarAlgAniamtions from "./AllAnimations/Graphs/AStarAlgAnimations.jsx";
 import DefaultScreen from "./AllAnimations/Default/DefaultAnimations.jsx";
+import LinearSearchAnimations from "./AllAnimations/Searching/LinearSearchAnimations.jsx";
+import BinarySearchAnimations from "./AllAnimations/Searching/BinarySearchAnimations.jsx";
 
 const Animations = ({
   Animation_name,
@@ -27,6 +29,7 @@ const Animations = ({
   Log,
   Random,
   Sort,
+  Pause,
   setAnimating,
 }) => {
   const canvasRef = useRef(null);
@@ -107,6 +110,41 @@ const Animations = ({
           Input={Input}
           menuWidth={menuWidth}
           Log={Log}
+        />
+      );
+
+    case "Linear Search":
+      return (
+        <LinearSearchAnimations
+          speed={speed}
+          height={height}
+          Add={Add}
+          Remove={Remove}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Sort={Sort}
+          Pause={Pause}
+          setAnimating={setAnimating}
+        />
+      );
+    case "Binary Search":
+      return (
+        <BinarySearchAnimations
+          speed={speed}
+          height={height}
+          Add={Add}
+          Remove={Remove}
+          Random={Random}
+          Clear={Clear}
+          Input={Input}
+          menuWidth={menuWidth}
+          Log={Log}
+          Sort={Sort}
+          Pause={Pause}
+          setAnimating={setAnimating}
         />
       );
 

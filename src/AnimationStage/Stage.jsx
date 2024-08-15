@@ -14,6 +14,7 @@ function Stage({ Animation_name, menuWidth }) {
   const [inputValue, setInputValue] = useState("");
   const [loggedMessage, setloggedMessage] = useState("");
   const [doSort, setDoSort] = useState(false);
+  const [doPause, setDoPause] = useState(false);
   const [doRandom, setDoRandom] = useState(false);
   const [isAnimating, setisAnimating] = useState(false);
 
@@ -55,6 +56,10 @@ function Stage({ Animation_name, menuWidth }) {
   const sort = () => {
     setDoSort(!doSort);
   };
+  const pause = () => {
+    setDoPause(!doPause);
+    //console.log(doPause);
+  };
   const random = () => {
     setDoRandom(!doRandom);
   };
@@ -89,6 +94,7 @@ function Stage({ Animation_name, menuWidth }) {
             Log={log}
             Random={doRandom}
             Sort={doSort}
+            Pause={doPause}
             setAnimating={setAnimating}
           />
         </div>
@@ -107,6 +113,7 @@ function Stage({ Animation_name, menuWidth }) {
         Sort={sort}
         Random={random}
         isAnimating={isAnimating}
+        Pause={pause}
       />
     </div>
   );

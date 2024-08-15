@@ -4,7 +4,7 @@ function DefaultScreen() {
   return (
     <>
       <div class="main">
-        <h>⚒ Welcome Page under Construction ⚒</h>
+        <h>⚒ Page under Construction ⚒</h>
       </div>
     </>
   );

@@ -1,8 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { cloneWith } from "lodash";
 
-const BubbleSortAnimations = ({
+const BinarySearchAnimations = ({
   speed,
   height,
   Add,
@@ -13,11 +12,14 @@ const BubbleSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  Pause,
   setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
   const [isAnimating, setisAnimating] = useState(false);
+  const isAnimatingRef = useRef(isAnimating);
+  const [animationQueue, setAnimationQueue] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [arr, setArr] = useState([]);
   const minBoxHight = 0.1; //the minimum box hight (as a percentage of tecanvas hight)
@@ -34,6 +36,7 @@ const BubbleSortAnimations = ({
   class Box {
     constructor(value) {
       this.value = value;
+      this.color = normalColor;
     }
     setX(x) {
       this.x = x;
@@ -41,32 +44,44 @@ const BubbleSortAnimations = ({
     setY(y) {
       this.y = y;
     }
+    setColor(color) {
+      this.color = color;
+    }
     moveX(value) {
       this.x += value;
     }
-
     setSorted() {
       this.sorted = true;
     }
-
     setUnSorted() {
       this.sorted = false;
     }
-
     equals(box) {
       return this.value == box.value && this.x == box.x && this.y == box.y;
     }
 
     draw(canvas, context, color) {
-      //draw the box
-      context.fillStyle = this.sorted ? "green" : color;
-      context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
-      context.strokeStyle = "white"; // Use the boxColor prop
-      context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
-      //Draw the index number
-      context.fillStyle = "white";
-      context.font = "14px Arial";
-      context.fillText(this.value, this.x + 16, this.y + 20);
+      if (arguments.length == 2) {
+        //draw the box
+        context.fillStyle = this.sorted ? "green" : this.color;
+        context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
+        context.strokeStyle = "white"; // Use the boxColor prop
+        context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
+        //Draw the index number
+        context.fillStyle = "white";
+        context.font = "14px Arial";
+        context.fillText(this.value, this.x + 16, this.y + 20);
+      } else {
+        //draw the box
+        context.fillStyle = this.sorted ? "green" : color;
+        context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
+        context.strokeStyle = "white"; // Use the boxColor prop
+        context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
+        //Draw the index number
+        context.fillStyle = "white";
+        context.font = "14px Arial";
+        context.fillText(this.value, this.x + 16, this.y + 20);
+      }
     }
   }
 
@@ -75,17 +90,27 @@ const BubbleSortAnimations = ({
     setAnimating(isAnimating);
   };
 
-  function clear() {
+  function clear(ignoreSort) {
     return new Promise((resolve) => {
       for (const box of arr) {
-        box.setUnSorted();
+        if (!ignoreSort) box.setUnSorted();
+        box.setColor(normalColor);
       }
       resolve(setArr(arr));
     });
   }
 
+  //helper function that just draws then arr
+  function draw() {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    for (const box of arr) {
+      box.draw(canvas, context);
+    }
+  }
+
   //Animates comparing two box's
-  function animateCompare(box1, box2) {
+  function animateHeilight(box1) {
     return new Promise((resolve) => {
       const canvas = canvasRef.current;
       const context = canvasRef.current.getContext("2d");
@@ -99,7 +124,7 @@ const BubbleSortAnimations = ({
         //display the array
         for (const box of arr) {
           //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          if (box.equals(box1) || box.equals(box2)) {
+          if (box.equals(box1)) {
             box.draw(canvas, context, hilightedColor);
           } else {
             box.draw(canvas, context, normalColor);
@@ -113,7 +138,6 @@ const BubbleSortAnimations = ({
         if (frameCounter < maxFrames - speed / 2) {
           // Request the next frame
           requestAnimationFrame(drawFrame);
-          //console.log("frame played");
         } else {
           // Reset the frame counter and stop the animation
           for (const box of arr) {
@@ -127,97 +151,113 @@ const BubbleSortAnimations = ({
       drawFrame();
     });
   }
-  //Animate the Swap
-  function animateSwap(box1, box2) {
-    return new Promise((resolve) => {
-      const canvas = canvasRef.current;
-      const context = canvasRef.current.getContext("2d");
-      const distanceApart = Math.abs(box1.x - box2.x);
-      const incramentValue = distanceApart / (maxFrames - speed / 2);
-      const isBox1RightofBox2 = box1.x > box2.x;
-      let frameCounter = 0;
-
-      //console.log(speed);
-
-      function drawFrame() {
-        //clean the canvas
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        //incrament
-        if (isBox1RightofBox2) {
-          //move box1 left and box2 right
-          box1.moveX(-incramentValue);
-          box2.moveX(incramentValue);
-        } else {
-          //move box2 left and box1 right
-          box1.moveX(incramentValue);
-          box2.moveX(-incramentValue);
-        }
-
-        //display the array
-        for (const box of arr) {
-          //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          box.draw(canvas, context, normalColor);
-        }
-        box1.draw(canvas, context, hilightedColor);
-        box2.draw(canvas, context, hilightedColor);
-
-        //incrament the frame counter
-        frameCounter++;
-
-        // Check if the max frames limit is reached
-        if (frameCounter < maxFrames - speed / 2) {
-          // Request the next frame
-          requestAnimationFrame(drawFrame);
-          //console.log("frame played");
-        } else {
-          // Reset the frame counter and stop the animation
-          for (const box of arr) {
-            box.draw(canvas, context, normalColor);
-          }
-          //console.log("swap complete");
-          resolve();
-        }
-      }
-      drawFrame();
-    });
-  }
 
   async function play() {
     //clear the of any colors before sorting
     await clear();
 
-    setisAnimating(true); //first set animating to true
-    let n = arr.length;
-    for (let i = 0; i < n - 1; i++) {
-      let swapped = false;
-      for (let j = 0; j < n - 1 - i; j++) {
-        //play the animation that compare
-        await animateCompare(arr[j], arr[j + 1]);
-        if (arr[j].value > arr[j + 1].value) {
-          //play the swap animation and swap elements
-          await animateSwap(arr[j], arr[j + 1]);
-          let tmpArr = arr;
-          let temp = tmpArr[j];
-          tmpArr[j] = tmpArr[j + 1];
-          tmpArr[j + 1] = temp;
-          setArr(tmpArr);
-          swapped = true;
-        }
-      }
-      // If no two elements were swapped in the inner loop, then the array is sorted
-      if (!swapped) break;
-    }
-
     const canvas = canvasRef.current;
     const context = canvasRef.current.getContext("2d");
 
-    for (let i = 0; i < arr.length; i++) {
-      arr[i].setSorted();
-      arr[i].draw(canvas, context, normalColor);
+    Log("searching for " + Input);
+    setisAnimating(true); //first set animating to true
+    let left = 0;
+    let right = arr.length - 1;
+    let mid;
+    const target = parseInt(Input, 10);
+
+    while (left <= right) {
+      mid = Math.floor((left + right) / 2);
+
+      //animate the cheack
+      await animateHeilight(arr[mid]);
+
+      if (arr[mid].value === target) break;
+      else if (arr[mid].value < target) {
+        left = mid + 1; // Search in the right half
+      } else {
+        right = mid - 1; // Search in the left half
+      }
     }
+
+    //if it finds the input its lokking for
+    if (arr[mid].value === target) {
+      arr[mid].setSorted();
+      arr[mid].draw(canvas, context, normalColor);
+      Log("found " + Input + " on index " + mid);
+      console.log("found " + Input + " on index " + mid);
+    } else {
+      //it dosent find the input
+      Log("Could not find " + Input);
+      console.log("Could not find " + Input);
+    }
+
     setisAnimating(false); //first set animating to true
-    Log("sorted");
+  }
+
+  function setAnimations() {
+    return new Promise((resolve) => {
+      clear();
+      let left = 0;
+      let right = arr.length - 1;
+      let mid;
+      const target = parseInt(Input, 10);
+
+      Log("searching for " + target);
+
+      while (left <= right) {
+        mid = Math.floor((left + right) / 2);
+
+        //animate the cheack
+        animationQueue.push("arr[" + mid + "].setColor(hilightedColor);");
+
+        if (arr[mid].value === target) break;
+        else if (arr[mid].value < target) {
+          left = mid + 1; // Search in the right half
+        } else {
+          right = mid - 1; // Search in the left half
+        }
+      }
+
+      //if it finds the input its lokking for
+      if (arr[mid].value === target) {
+        animationQueue.push("arr[" + mid + "].setSorted();");
+
+        animationQueue.push(
+          'Log("Found "' +
+            "+" +
+            target +
+            "+" +
+            '" on index "' +
+            "+" +
+            mid +
+            ");",
+        );
+      } else {
+        //it dosent find the input
+        animationQueue.push(' Log("Could not find "' + "+" + target + ");");
+      }
+
+      animationQueue.push("setisAnimating(false);"); //first set animating to true
+
+      resolve(console.log("finsihed setting animations"));
+    });
+  }
+
+  //goes through the animation queue on where ever it left off
+  async function search() {
+    //console.log(animationQueue);
+    //while paused hasnt been pressed (isAnimating) go through the animation queue
+    while (animationQueue.length) {
+      if (!isAnimatingRef.current) break; //if paused stop traversing throught queue
+
+      clear(true);
+      eval(animationQueue.shift());
+      draw();
+      if (animationQueue.length > 2) {
+        await new Promise((resolve) => setTimeout(resolve, 1500 - 7 * speed));
+      }
+    }
   }
 
   //function that maps a value
@@ -276,6 +316,13 @@ const BubbleSortAnimations = ({
       } else if (arr.length >= maxArrsize) {
         //checks if aray is full
         Log("Max Array size reached");
+      } else if (parseInt(Input, 10) <= arr[arr.length - 1].value) {
+        //makes shure the nex inputed value is larger than the las value in the array
+        Log(
+          "Input invalid : must be larger than " +
+            arr[arr.length - 1].value +
+            " to keep its sorted nature",
+        );
       } else {
         setArr([...arr, new Box(parseInt(Input, 10))]); //need to parseInt since the bare Input is a string and this causes problems when finding the max and min value in arr
         Log("Added " + Input);
@@ -304,11 +351,16 @@ const BubbleSortAnimations = ({
   //Sets a Random set of arrays for arr
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
-      var array = [];
-      for (var i = 0; i < maxArrsize; i++) {
-        array.push(
-          new Box(Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt),
-        );
+      let array = [];
+      array.push(
+        new Box(
+          Math.floor(Math.random() * (maxInt - maxArrsize - minInt + 1)) +
+            minInt,
+        ),
+      );
+      for (let i = 1; i < maxArrsize; i++) {
+        const add = Math.floor(Math.random() * (10 - 1 + 1)) + 1;
+        array.push(new Box(array[i - 1].value + add));
       }
       setArr(array);
       Log("Set to a Random array ");
@@ -323,15 +375,39 @@ const BubbleSortAnimations = ({
     }
   }, [Clear]);
 
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      console.log("pressed pause");
+      setisAnimating(false);
+      isAnimatingRef.current = false;
+      console.log(isAnimating);
+    }
+  }, [Pause]);
+
   //handels any sorting
   useEffect(() => {
     //make shure it dosent run on start
     // check if its alredy animation
     if (isMounted.current && !isAnimating) {
       if (arr.length > 0) {
-        play();
+        //set the animation to true
+        setisAnimating(true);
+        isAnimatingRef.current = true;
+        console.log("pressed search");
+        // console.log(animationQueue);
+
+        //if animationqueue is empty it should set the queue then run through the queue
+        if (animationQueue.length == 0) {
+          (async () => {
+            await setAnimations();
+          })();
+          search();
+        } else {
+          search();
+        }
+        //if the animation queue isnt full then it should continue runing through the queue
       } else {
-        Log("Error: Cannot Sort an Empty Array");
+        Log("Error: Cannot Search an Empty Array");
       }
     }
   }, [Sort]);
@@ -371,14 +447,14 @@ const BubbleSortAnimations = ({
       //updates the x and y values then redraws them
       updateAll();
       for (const box of arr) {
-        box.draw(canvas, context, normalColor);
+        box.draw(canvas, context);
       }
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);
 
   return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
 };
-export default BubbleSortAnimations;
-BubbleSortAnimations.prototype = {
+export default BinarySearchAnimations;
+BinarySearchAnimations.prototype = {
   toggle: PropTypes.func.isRequired,
 };

@@ -6,6 +6,7 @@ import QueuesMenu from "./AllAnimationMenus/SimpleDataTypes/QueuesMenu.jsx";
 import SortingMenu from "./AllAnimationMenus/Sorting/SortingMenu.jsx";
 import GraphsMenu from "./AllAnimationMenus/Graphs/GraphsMenu.jsx";
 import DefaultMenuScreen from "./AllAnimationMenus/Default/DefaultAnimationsMenu.jsx";
+import SearchMenu from "./AllAnimationMenus/Search/SearchMenu.jsx";
 
 function ControleMenu({
   Animation_name,
@@ -20,6 +21,7 @@ function ControleMenu({
   Sort,
   Random,
   isAnimating,
+  Pause,
 }) {
   const isMounted = useRef(false);
 
@@ -53,6 +55,10 @@ function ControleMenu({
 
   const [aStarAlgConsoleOuput, setAStarAlgConsoleOuput] = useState([]);
 
+  const [linearSearchConsoleOuput, setlinearSearchConsoleOuput] = useState([]);
+
+  const [binarySearchConsoleOuput, setbinarySearchConsoleOuput] = useState([]);
+
   //Makes shure the logs are cleared when ever a Diffrent Animation is pressed
   useEffect(() => {
     setStacksConsoleOuput([]);
@@ -67,6 +73,8 @@ function ControleMenu({
     setdfsAlgorithmsConsoleOuput([]);
     setdijkstrasAlgConsoleOuput([]);
     setAStarAlgConsoleOuput([]);
+    setlinearSearchConsoleOuput([]);
+    setbinarySearchConsoleOuput([]);
   }, [Animation_name]);
 
   //Displays the Logs when ever the logmessage changes (displays in the console the last action done)
@@ -88,6 +96,16 @@ function ControleMenu({
         case "Queues-linkedList":
           setQueueslinkedListConsoleOuput([
             ...queueslinkedListConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "Linear Search":
+          setlinearSearchConsoleOuput([
+            ...linearSearchConsoleOuput,
+            " > " + LoggedMessage,
+          ]);
+        case "Binary Search":
+          setbinarySearchConsoleOuput([
+            ...binarySearchConsoleOuput,
             " > " + LoggedMessage,
           ]);
         case "Bubble Sort":
@@ -276,6 +294,60 @@ function ControleMenu({
           <div className="Console-Text">
             <ul className="list">
               {insertionSortConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Linear Search":
+      return (
+        <>
+          <SearchMenu
+            Add={Add}
+            Remove={Remove}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Pause={Pause}
+            Random={Random}
+            isAnimating={isAnimating}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {linearSearchConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Binary Search":
+      return (
+        <>
+          <SearchMenu
+            Add={Add}
+            Remove={Remove}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Pause={Pause}
+            Random={Random}
+            isAnimating={isAnimating}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {binarySearchConsoleOuput.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
