@@ -31,7 +31,6 @@ const LinearSearchAnimations = ({
   const maxFrames = 55;
   const normalColor = "gray";
   const hilightedColor = "red";
-  let i;
 
   //the class that represents the box's'
   class Box {
@@ -215,7 +214,7 @@ const LinearSearchAnimations = ({
 
       let n = arr.length;
 
-      for (i = 0; i < n; i++) {
+      for (let i = 0; i < n; i++) {
         //animate compare the ith element
         animationQueue.push("arr[" + i + "].setColor(hilightedColor);");
         //animationQueue.push(`(async () => {await clear();})()`); //clear the array of colors first
