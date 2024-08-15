@@ -309,7 +309,7 @@ const BinarySearchAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes shure there isnt any annimations going on
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && animationQueue.length == 0) {
       //checks if the input is valid
       if (Input == "") {
         Log("Input empty");
@@ -334,7 +334,7 @@ const BinarySearchAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes sure there isnt any annimations going on
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && animationQueue.length == 0) {
       //checks if arr is empty
       if (arr.length < 1) {
         Log("Cannot remove: Array is Empty");
@@ -350,7 +350,7 @@ const BinarySearchAnimations = ({
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && animationQueue.length == 0) {
       let array = [];
       array.push(
         new Box(
@@ -369,7 +369,7 @@ const BinarySearchAnimations = ({
 
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && animationQueue.length == 0) {
       setArr([]);
       Log("Cleard!");
     }
