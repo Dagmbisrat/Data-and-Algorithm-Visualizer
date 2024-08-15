@@ -209,7 +209,7 @@ const BinarySearchAnimations = ({
         mid = Math.floor((left + right) / 2);
 
         //animate the cheack
-        animationQueue.push("arr[" + mid + "].setColor(hilightedColor);");
+        animationQueue.push("arr[" + mid + '].setColor("red");');
 
         if (arr[mid].value === target) break;
         else if (arr[mid].value < target) {

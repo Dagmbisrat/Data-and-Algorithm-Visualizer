@@ -216,7 +216,7 @@ const LinearSearchAnimations = ({
       let i;
       for (i = 0; i < n; i++) {
         //animate compare the ith element
-        animationQueue.push("arr[" + i + "].setColor(hilightedColor);");
+        animationQueue.push("arr[" + i + '].setColor("red");');
         //animationQueue.push(`(async () => {await clear();})()`); //clear the array of colors first
 
         //if the ith element is the elemnt that it is searching for it breaks through the loop
