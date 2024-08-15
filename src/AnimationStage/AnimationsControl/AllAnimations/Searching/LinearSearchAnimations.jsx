@@ -213,8 +213,8 @@ const LinearSearchAnimations = ({
       Log("Searching for " + input); //log whats going om
 
       let n = arr.length;
-
-      for (let i = 0; i < n; i++) {
+      let i;
+      for (i = 0; i < n; i++) {
         //animate compare the ith element
         animationQueue.push("arr[" + i + "].setColor(hilightedColor);");
         //animationQueue.push(`(async () => {await clear();})()`); //clear the array of colors first
