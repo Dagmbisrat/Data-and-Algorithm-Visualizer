@@ -2,7 +2,7 @@ import "./StacksMenu.css";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 
-function StacksMenu({ Push, Pop, Clear, updateSpeed, Input, updateInput }) {
+function StacksMenu({ Push, Pop, Clear, Input, updateInput }) {
   const largestAcceptedInput = 99;
 
   const handleInputChange = (event) => {

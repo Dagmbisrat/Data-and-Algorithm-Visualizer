@@ -16,6 +16,7 @@ import AStarAlgAniamtions from "./AllAnimations/Graphs/AStarAlgAnimations.jsx";
 import DefaultScreen from "./AllAnimations/Default/DefaultAnimations.jsx";
 import LinearSearchAnimations from "./AllAnimations/Searching/LinearSearchAnimations.jsx";
 import BinarySearchAnimations from "./AllAnimations/Searching/BinarySearchAnimations.jsx";
+import TestAnimations from "../../../test.jsx";
 
 const Animations = ({
   Animation_name,
@@ -130,6 +131,7 @@ const Animations = ({
           setAnimating={setAnimating}
         />
       );
+
     case "Binary Search":
       return (
         <BinarySearchAnimations
@@ -161,6 +163,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          Pause={Pause}
           setAnimating={setAnimating}
         />
       );
@@ -178,6 +181,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          Pause={Pause}
           setAnimating={setAnimating}
         />
       );
@@ -195,6 +199,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          Pause={Pause}
           setAnimating={setAnimating}
         />
       );
@@ -212,6 +217,7 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Sort={Sort}
+          Pause={Pause}
           setAnimating={setAnimating}
         />
       );
@@ -226,6 +232,8 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Search={Sort}
+          Pause={Pause}
+          setAnimating={setAnimating}
         />
       );
     case "Depth First Search":
@@ -239,6 +247,8 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Search={Sort}
+          Pause={Pause}
+          setAnimating={setAnimating}
         />
       );
     case "Dijkstra's Alg":
@@ -252,6 +262,8 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Search={Sort}
+          Pause={Pause}
+          setAnimating={setAnimating}
         />
       );
 
@@ -266,6 +278,8 @@ const Animations = ({
           menuWidth={menuWidth}
           Log={Log}
           Search={Sort}
+          Pause={Pause}
+          setAnimating={setAnimating}
         />
       );
 

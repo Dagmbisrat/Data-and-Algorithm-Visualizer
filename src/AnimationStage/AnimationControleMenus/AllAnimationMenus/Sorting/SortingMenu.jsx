@@ -1,6 +1,6 @@
 import "./SortingMenu.css";
 import PropTypes from "prop-types";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 function SortingMenu({
   Add,
@@ -11,10 +11,13 @@ function SortingMenu({
   Input,
   updateInput,
   Sort,
+  Pause,
   Random,
   isAnimating,
 }) {
   const largestAcceptedInput = 99;
+  const [isClicked, setIsClicked] = useState(false);
+  const delay = 1500;
 
   const handleSpeedChange = (event) => {
     // console.log("handleSpeedChange");
@@ -29,6 +32,32 @@ function SortingMenu({
     ) {
       updateInput(event.target.value);
     }
+  };
+
+  //makes shure multiple clicks wont be registed at once
+  const handleSort = () => {
+    if (isClicked) return;
+
+    setIsClicked(true);
+    Sort();
+
+    // Re-enable the button after the delay
+    setTimeout(() => {
+      setIsClicked(false);
+    }, delay);
+  };
+
+  //makes shure multiple clicks wont be registed at once
+  const handlePause = () => {
+    if (isClicked) return;
+
+    setIsClicked(true);
+    Pause();
+
+    // Re-enable the button after the delay
+    setTimeout(() => {
+      setIsClicked(false);
+    }, delay);
   };
 
   return (
@@ -60,16 +89,17 @@ function SortingMenu({
           </button>
         </div>
         <div class="set">
-          <button class="sort-button" onClick={Sort}>
-            <span class="play-icon">▶</span>
-            Sort
-            {/* {!isAnimating ? (
+          {!isAnimating ? (
+            <button class="sort-button" onClick={handleSort}>
               <span class="play-icon">▶</span>
-            ) : (
+              Search
+            </button>
+          ) : (
+            <button class="sort-button" onClick={handlePause}>
               <span class="play-icon">▐▐</span>
-            )}
-            {!isAnimating ? "Sort" : "Pause"} */}
-          </button>
+              Pause
+            </button>
+          )}
           <div className="slidecontainer">
             <div class="slider-container">
               <label for="speed-slider">Speed</label>

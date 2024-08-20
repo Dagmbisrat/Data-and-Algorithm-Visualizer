@@ -12,13 +12,16 @@ const HeapSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  Pause,
   setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
   const [isAnimating, setisAnimating] = useState(false);
+  const isAnimatingRef = useRef(isAnimating);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [arr, setArr] = useState([]);
+  const [animationQueue, setAnimationQueue] = useState([]);
   const maxBoxHight = 0.9; //the Max box hight (as a percentage of the canvas hight)
   const maxArrsize = 15;
   const boxWidth = 45;
@@ -107,6 +110,34 @@ const HeapSortAnimations = ({
     }
   }
 
+  //sets isAnimating useeffect and ref
+  function changeIsAnimating(bool) {
+    setisAnimating(bool);
+    isAnimatingRef.current = bool;
+  }
+
+  const functionMap = {
+    animateCompare: async (side, largest, arry) => {
+      await animateCompare(side, largest, arr);
+    },
+    animateSwap: async (i, largest, arry) => {
+      await animateSwap(i, largest, arr);
+    },
+    set: (arr, i) => {
+      if (i) arr[i].setSorted();
+      setArr(arr);
+      updateAll();
+    },
+    end: (arr) => {
+      arr[0].setSorted();
+
+      setArr(arr);
+      updateAll();
+
+      setisAnimating(false);
+      Log("sorted");
+    },
+  };
   //sends if its animiting
   const sendisAnimating = () => {
     setAnimating(isAnimating);
@@ -139,14 +170,14 @@ const HeapSortAnimations = ({
     return tempArr;
   }
 
-  const drawHeap = (
+  function drawHeap(
     context,
     arr,
     index1 = null,
     index2 = null,
     turnoff = false,
     connect = null,
-  ) => {
+  ) {
     let arrTree = copyArray(arr);
     for (let i = 0; i < arrTree.length; i++) {
       //update there new x and y values
@@ -181,7 +212,7 @@ const HeapSortAnimations = ({
         arrTree[i].drawinHeap(context, normalColor);
       }
     }
-  };
+  }
 
   // Function to draw a line
   function drawLine(context, x1, y1, x2, y2) {
@@ -269,7 +300,16 @@ const HeapSortAnimations = ({
           // Request the next frame
           requestAnimationFrame(drawFrame);
         } else {
-          context.clearRect(0, 0, canvas.width, canvas.height);
+          [arr[parentIndex].value, arr[childIndex].value] = [
+            arr[childIndex].value,
+            arr[parentIndex].value,
+          ];
+          if (arr[parentIndex].value < arr[childIndex].value)
+            arr[childIndex].setSorted();
+
+          // Recursively heapify the affected sub-tree
+          setArr(arr);
+          updateAll();
           resolve();
         }
       }
@@ -311,7 +351,6 @@ const HeapSortAnimations = ({
           // Request the next frame
           requestAnimationFrame(drawFrame);
         } else {
-          context.clearRect(0, 0, canvas.width, canvas.height);
           resolve();
         }
       }
@@ -329,16 +368,16 @@ const HeapSortAnimations = ({
       let temp = copyArray(arr);
 
       //animate compareing the left to the largest
-      await animateCompare(left, largest, arr); //make shure this function checks if the left index exists
+      animationQueue.push(["animateCompare", left, largest, copyArray(arr)]);
 
       // If left child is larger than root
       if (left < n && arr[left].value > arr[largest].value) {
-        console;
+        //console;
         largest = left;
       }
 
       //animate compareing the left to the largest
-      await animateCompare(right, largest, arr);
+      animationQueue.push(["animateCompare", right, largest, copyArray(arr)]);
 
       // If right child is larger than largest so far
       if (right < n && arr[right].value > arr[largest].value) {
@@ -349,7 +388,7 @@ const HeapSortAnimations = ({
       if (largest !== i) {
         //animate Swap
 
-        await animateSwap(i, largest, arr);
+        animationQueue.push(["animateSwap", i, largest, copyArray(arr)]);
 
         // Move current root to end
         [temp[largest].value, temp[i].value] = [
@@ -368,55 +407,66 @@ const HeapSortAnimations = ({
     });
   }
 
-  async function play() {
-    //clear all green before starting
-    clear();
-    setisAnimating(true);
+  function setAnimations() {
+    return new Promise(async (resolve) => {
+      //clear all green before starting
+      clear();
 
-    //Build a max heap
-    let n = arr.length;
-    let temp = copyArray(arr);
-    for (const box of temp) {
-      box.sorted = false;
+      //Build a max heap
+      let n = arr.length;
+      let temp = copyArray(arr);
+      for (const box of temp) {
+        box.sorted = false;
+      }
+
+      for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+        temp = await heapify(temp, n, i);
+
+        animationQueue.push(["set", copyArray(temp)]);
+      }
+
+      // Extract elements from heap one by one
+      for (let i = n - 1; i > 0; i--) {
+        //animate the swap
+        animationQueue.push(["animateSwap", 0, i, copyArray(temp)]);
+
+        // Move current root to end
+        [temp[0].value, temp[i].value] = [temp[i].value, temp[0].value];
+
+        temp[i].setSorted();
+        animationQueue.push(["set", copyArray(temp), i]);
+
+        // Call max heapify on the reduced heap
+        temp = await heapify(temp, i, 0);
+        animationQueue.push(["set", copyArray(temp)]);
+      }
+
+      animationQueue.push(["end", temp]);
+      resolve();
+    });
+  }
+
+  //goes through the animation queue on where ever it left off
+  async function sort() {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    //while paused hasnt been pressed (isAnimating) go through the animation queue
+    while (animationQueue.length && isAnimatingRef.current) {
+      const func = animationQueue.shift();
+      const args = func.splice(1);
+
+      //console.log(func);
+      await functionMap[func](...args);
+
+      //console.log("done");
     }
-
-    for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
-      temp = await heapify(temp, n, i);
-      setArr(temp);
-      updateAll();
-    }
-
-    // Extract elements from heap one by one
-    for (let i = n - 1; i > 0; i--) {
-      //animate the swap
-      await animateSwap(0, i, temp);
-
-      // Move current root to end
-      [temp[0].value, temp[i].value] = [temp[i].value, temp[0].value];
-
-      temp[i].setSorted();
-
-      setArr(temp);
-      updateAll();
-
-      // Call max heapify on the reduced heap
-      temp = await heapify(temp, i, 0);
-      setArr(temp);
-    }
-
-    temp[0].setSorted();
-    console.log("sorted 0 ");
-    setArr(temp);
-    updateAll();
-
-    setisAnimating(false);
-    Log("sorted");
   }
 
   //finds the x value for displaying the tree
   function findX(index) {
     if (index == 0) {
-      return (windowWidth - menuWidth) / 2;
+      const middle = Math.floor(arr.length / 2);
+      return arr[middle].x + boxWidth / 2;
     }
 
     const parantIndex = Math.floor((index - 1) / 2);
@@ -440,7 +490,7 @@ const HeapSortAnimations = ({
   }
 
   //updates all the x and y values of each box in the array for proper displaying
-  const updateAll = () => {
+  function updateAll() {
     //everything should happen if the array isnt empty
     if (arr.length > 0) {
       //Finds the starting x value postion for the array
@@ -459,13 +509,13 @@ const HeapSortAnimations = ({
         xstart = xstart + boxWidth + 3;
       }
     }
-  };
+  }
 
   //A use effect that adds a box to the array when add is pressed
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes shure there isnt any annimations going on
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       //checks if the input is valid
       if (Input == "") {
         Log("Input empty");
@@ -483,7 +533,7 @@ const HeapSortAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes sure there isnt any annimations going on
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       //checks if arr is empty
       if (arr.length < 1) {
         Log("Cannot remove: Array is Empty");
@@ -499,9 +549,10 @@ const HeapSortAnimations = ({
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       var array = [];
-      for (var i = 0; i < maxArrsize; i++) {
+      const ranNum = Math.floor(Math.random() * maxArrsize) + 1;
+      for (var i = 0; i < ranNum; i++) {
         array.push(
           new Box(Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt),
         );
@@ -513,12 +564,21 @@ const HeapSortAnimations = ({
 
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       setArr([]);
 
       Log("Cleard!");
     }
   }, [Clear]);
+
+  //Handels when pause button is pressed
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      Log("Paused");
+
+      changeIsAnimating(false);
+    }
+  }, [Pause]);
 
   //handels any sorting
   useEffect(() => {
@@ -526,7 +586,18 @@ const HeapSortAnimations = ({
     //also makes sure it isn't alredy animating
     if (isMounted.current && !isAnimating) {
       if (arr.length > 0) {
-        play();
+        changeIsAnimating(true);
+        if (!animationQueue.length) {
+          (async () => {
+            await setAnimations();
+            //console.log(animationQueue);
+          })();
+          sort();
+        } else {
+          Log("Resumed");
+          sort();
+        }
+        // play();
       } else {
         Log("Error: Cannot Sort an Empty Array");
       }
@@ -548,6 +619,15 @@ const HeapSortAnimations = ({
     };
   }, []);
 
+  //pauses the animation if teh windown is changed when animating
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      Log("Paused");
+
+      changeIsAnimating(false);
+    }
+  }, [menuWidth, windowWidth]);
+
   //Updates Is mounted when after compleation of mountings
   useEffect(() => {
     isMounted.current = true;
@@ -566,12 +646,11 @@ const HeapSortAnimations = ({
       canvas.width = windowWidth - menuWidth;
       context.clearRect(0, 0, canvas.width, canvas.height);
       //updates the values then draws them only when its not sorting
-      if (!isAnimating) {
-        updateAll();
-        for (const box of arr) {
-          box.draw(context, normalColor);
-        }
+      updateAll();
+      for (const box of arr) {
+        box.draw(context, normalColor);
       }
+      drawHeap(context, arr);
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);
 

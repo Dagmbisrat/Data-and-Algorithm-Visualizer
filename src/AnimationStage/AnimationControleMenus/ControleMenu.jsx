@@ -249,58 +249,6 @@ function ControleMenu({
         </>
       );
 
-    case "Bubble Sort":
-      return (
-        <>
-          <SortingMenu
-            Add={Add}
-            Remove={Remove}
-            Clear={Clear}
-            updateSpeed={updateSpeed_}
-            speed={speed}
-            Input={Input}
-            updateInput={updateInput_}
-            Sort={Sort}
-            Random={Random}
-            isAnimating={isAnimating}
-          />
-          <div className="Console">Console</div>
-          <div className="Console-Text">
-            <ul className="list">
-              {bubbleSortConsoleOuput.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        </>
-      );
-
-    case "Insertion Sort":
-      return (
-        <>
-          <SortingMenu
-            Add={Add}
-            Remove={Remove}
-            Clear={Clear}
-            updateSpeed={updateSpeed_}
-            speed={speed}
-            Input={Input}
-            updateInput={updateInput_}
-            Sort={Sort}
-            Random={Random}
-            isAnimating={isAnimating}
-          />
-          <div className="Console">Console</div>
-          <div className="Console-Text">
-            <ul className="list">
-              {insertionSortConsoleOuput.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        </>
-      );
-
     case "Linear Search":
       return (
         <>
@@ -355,6 +303,60 @@ function ControleMenu({
         </>
       );
 
+    case "Bubble Sort":
+      return (
+        <>
+          <SortingMenu
+            Add={Add}
+            Remove={Remove}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Pause={Pause}
+            Random={Random}
+            isAnimating={isAnimating}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {bubbleSortConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
+    case "Insertion Sort":
+      return (
+        <>
+          <SortingMenu
+            Add={Add}
+            Remove={Remove}
+            Clear={Clear}
+            updateSpeed={updateSpeed_}
+            speed={speed}
+            Input={Input}
+            updateInput={updateInput_}
+            Sort={Sort}
+            Pause={Pause}
+            Random={Random}
+            isAnimating={isAnimating}
+          />
+          <div className="Console">Console</div>
+          <div className="Console-Text">
+            <ul className="list">
+              {insertionSortConsoleOuput.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      );
+
     case "Merge Sort":
       return (
         <>
@@ -367,6 +369,7 @@ function ControleMenu({
             Input={Input}
             updateInput={updateInput_}
             Sort={Sort}
+            Pause={Pause}
             Random={Random}
             isAnimating={isAnimating}
           />
@@ -393,6 +396,7 @@ function ControleMenu({
             Input={Input}
             updateInput={updateInput_}
             Sort={Sort}
+            Pause={Pause}
             Random={Random}
             isAnimating={isAnimating}
           />
@@ -417,7 +421,9 @@ function ControleMenu({
             Input={Input}
             updateInput={updateInput_}
             Sort={Sort}
+            Pause={Pause}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">
@@ -440,7 +446,9 @@ function ControleMenu({
             Input={Input}
             updateInput={updateInput_}
             Sort={Sort}
+            Pause={Pause}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">
@@ -463,7 +471,9 @@ function ControleMenu({
             Input={Input}
             updateInput={updateInput_}
             Sort={Sort}
+            Pause={Pause}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">
@@ -486,7 +496,9 @@ function ControleMenu({
             Input={Input}
             updateInput={updateInput_}
             Sort={Sort}
+            Pause={Pause}
             Random={Random}
+            isAnimating={isAnimating}
           />
           <div className="Console">Console</div>
           <div className="Console-Text">

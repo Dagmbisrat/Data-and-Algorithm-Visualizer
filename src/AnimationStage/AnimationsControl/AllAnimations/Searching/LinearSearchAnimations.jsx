@@ -28,7 +28,6 @@ const LinearSearchAnimations = ({
   const boxWidth = 45;
   const maxInt = 99;
   const minInt = -99;
-  const maxFrames = 55;
   const normalColor = "gray";
   const hilightedColor = "red";
 
@@ -60,30 +59,33 @@ const LinearSearchAnimations = ({
       return this.value == box.value && this.x == box.x && this.y == box.y;
     }
 
-    draw(canvas, context, color) {
-      if (arguments.length == 2) {
-        //draw the box
-        context.fillStyle = this.sorted ? "green" : this.color;
-        context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
-        context.strokeStyle = "white"; // Use the boxColor prop
-        context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
-        //Draw the index number
-        context.fillStyle = "white";
-        context.font = "14px Arial";
-        context.fillText(this.value, this.x + 16, this.y + 20);
-      } else {
-        //draw the box
-        context.fillStyle = this.sorted ? "green" : color;
-        context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
-        context.strokeStyle = "white"; // Use the boxColor prop
-        context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
-        //Draw the index number
-        context.fillStyle = "white";
-        context.font = "14px Arial";
-        context.fillText(this.value, this.x + 16, this.y + 20);
-      }
+    draw(canvas, context) {
+      //draw the box
+      context.fillStyle = this.sorted ? "green" : this.color;
+      context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
+      context.strokeStyle = "white"; // Use the boxColor prop
+      context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
+      //Draw the index number
+      context.fillStyle = "white";
+      context.font = "14px Arial";
+      context.fillText(this.value, this.x + 16, this.y + 20);
     }
   }
+
+  const functionMap = {
+    setColor: (i) => {
+      arr[i].setColor(hilightedColor);
+    },
+    setSorted: (i) => {
+      arr[i].setSorted();
+    },
+    Log: (str) => {
+      Log(str);
+    },
+    setisAnimating: (bool) => {
+      setisAnimating(bool);
+    },
+  };
 
   //sends if its animiting
   const sendisAnimating = () => {
@@ -104,103 +106,31 @@ const LinearSearchAnimations = ({
   function draw() {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
     for (const box of arr) {
       box.draw(canvas, context);
     }
   }
 
-  //Animates comparing two box's
-  function animateHeilight(box1) {
-    return new Promise((resolve) => {
-      const canvas = canvasRef.current;
-      const context = canvasRef.current.getContext("2d");
-      let frameCounter = 0;
-
-      //draw the array logic
-      function drawFrame() {
-        //clean the canvas
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        //display the array
-        for (const box of arr) {
-          //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          if (box.equals(box1)) {
-            box.draw(canvas, context, hilightedColor);
-          } else {
-            box.draw(canvas, context, normalColor);
-          }
-        }
-
-        //incrament the frame counter
-        frameCounter++;
-
-        // Check if the max frames limit is reached
-        if (frameCounter < maxFrames - speed / 2) {
-          // Request the next frame
-          requestAnimationFrame(drawFrame);
-        } else {
-          // Reset the frame counter and stop the animation
-          for (const box of arr) {
-            box.draw(canvas, context, normalColor);
-          }
-          //console.log("Animation complete");
-          resolve();
-        }
-      }
-
-      drawFrame();
-    });
-  }
-
-  async function play() {
-    //clear the of any colors before sorting
-
-    Log("Searching for " + Input);
-    setisAnimating(true); //first set animating to true
-
-    await clear();
-
-    const canvas = canvasRef.current;
-    const context = canvasRef.current.getContext("2d");
-
-    let n = arr.length,
-      i;
-
-    for (i = 0; i < n; i++) {
-      //animate compare the ith element
-      await animateHeilight(arr[i]);
-      // animationQueue.push("await animateHeilight(arr[i]);");
-      // animationQueue.push("await clear();");
-
-      //if the ith element is the elemnt that it is searching for it breaks through the loop
-
-      if (arr[i].value == parseInt(Input, 10)) break;
-    }
-    //if it finds the input its lokking for
-    if (i < n) {
-      arr[i].setSorted();
-      arr[i].draw(canvas, context, normalColor);
-      Log("found " + Input + " on index " + i);
-    } else {
-      //it dosent find the input
-      Log("Could not find " + Input);
-    }
-
-    setisAnimating(false); //first set animating to true
+  //sets isAnimating useeffect and ref
+  function changeIsAnimating(bool) {
+    setisAnimating(bool);
+    isAnimatingRef.current = bool;
   }
 
   //goes through the animation queue on where ever it left off
   async function search() {
     //while paused hasnt been pressed (isAnimating) go through the animation queue
-    while (animationQueue.length) {
-      //console.log(animationQueue);
-      if (!isAnimatingRef.current) break; //if paused stop traversing throught queue
-
+    while (animationQueue.length && isAnimatingRef.current) {
       await clear(true);
-      eval(animationQueue.shift());
+      const func = animationQueue.shift();
+      const args = func.splice(1);
+
+      //console.log(func);
+      functionMap[func](...args);
       draw();
-      if (animationQueue.length > 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1500 - 7 * speed));
+      if (animationQueue.length >= 2) {
+        await new Promise((resolve) => setTimeout(resolve, 1500 - 10 * speed));
       }
     }
   }
@@ -216,8 +146,7 @@ const LinearSearchAnimations = ({
       let i;
       for (i = 0; i < n; i++) {
         //animate compare the ith element
-        animationQueue.push("arr[" + i + '].setColor("red");');
-        //animationQueue.push(`(async () => {await clear();})()`); //clear the array of colors first
+        animationQueue.push(["setColor", i]); //clear the array of colors first
 
         //if the ith element is the elemnt that it is searching for it breaks through the loop
 
@@ -225,19 +154,18 @@ const LinearSearchAnimations = ({
       }
       //if it finds the input its lokking for
       if (i < n) {
-        animationQueue.push("arr[" + i + "].setSorted();");
-
-        animationQueue.push(
-          'Log("Found "' + "+" + input + "+" + '" on index "' + "+" + i + ");",
-        );
+        animationQueue.push(["setSorted", i]);
+        animationQueue.push(["Log", `Found ${input} on index ${i}`]);
       } else {
         //it dosent find the input
-        animationQueue.push(' Log("Could not find "' + "+" + input + ");");
+
+        animationQueue.push(["Log", `${input} dosent exisit in the array`]);
       }
 
-      animationQueue.push("setisAnimating(false);"); //first set animating to true
+      //animation is done
+      animationQueue.push(["setisAnimating", false]);
 
-      resolve(console.log("finsihed setting animations"));
+      resolve();
     });
   }
 
@@ -290,7 +218,7 @@ const LinearSearchAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes shure there isnt any annimations going on
-    if (isMounted.current && animationQueue.length == 0) {
+    if (isMounted.current && !animationQueue.length) {
       //checks if the input is valid
       if (Input == "") {
         Log("Input empty");
@@ -308,7 +236,7 @@ const LinearSearchAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes sure there isnt any annimations going on
-    if (isMounted.current && animationQueue.length == 0) {
+    if (isMounted.current && !animationQueue.length) {
       //checks if arr is empty
       if (arr.length < 1) {
         Log("Cannot remove: Array is Empty");
@@ -324,7 +252,7 @@ const LinearSearchAnimations = ({
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
-    if (isMounted.current && animationQueue.length == 0) {
+    if (isMounted.current && !animationQueue.length) {
       var array = [];
       for (var i = 0; i < maxArrsize; i++) {
         array.push(
@@ -338,7 +266,7 @@ const LinearSearchAnimations = ({
 
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
-    if (isMounted.current && animationQueue.length == 0) {
+    if (isMounted.current && !animationQueue.length) {
       setArr([]);
       Log("Cleard!");
     }
@@ -346,10 +274,10 @@ const LinearSearchAnimations = ({
 
   useEffect(() => {
     if (isMounted.current && isAnimating) {
-      console.log("pressed pause");
-      setisAnimating(false);
-      isAnimatingRef.current = false;
-      console.log(isAnimating);
+      //console.log("pressed pause");
+      Log("Paused");
+      changeIsAnimating(false);
+      //console.log(isAnimating);
     }
   }, [Pause]);
 
@@ -360,9 +288,8 @@ const LinearSearchAnimations = ({
     if (isMounted.current && !isAnimating) {
       if (arr.length > 0) {
         //set the animation to true
-        setisAnimating(true);
-        isAnimatingRef.current = true;
-        console.log("pressed search");
+        changeIsAnimating(true);
+        //console.log("pressed search");
         // console.log(animationQueue);
 
         //if animationqueue is empty it should set the queue then run through the queue
@@ -372,6 +299,7 @@ const LinearSearchAnimations = ({
           })();
           search();
         } else {
+          Log("Resumed");
           search();
         }
         //if the animation queue isnt full then it should continue runing through the queue

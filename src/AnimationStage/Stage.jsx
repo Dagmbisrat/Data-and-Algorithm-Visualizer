@@ -58,7 +58,6 @@ function Stage({ Animation_name, menuWidth }) {
   };
   const pause = () => {
     setDoPause(!doPause);
-    //console.log(doPause);
   };
   const random = () => {
     setDoRandom(!doRandom);

@@ -10,12 +10,16 @@ const BreathFirstSearchAnimations = ({
   menuWidth,
   Log,
   Search,
+  Pause,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
   const rootNode = 0;
-  const maxArrsize = 10;
+  const maxArrsize = 15;
   const [isAnimating, setisAnimating] = useState(false);
+  const isAnimatingRef = useRef(isAnimating);
+  const [animationQueue, setAnimationQueue] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [graph, setGraph] = useState([
     [],
@@ -66,6 +70,32 @@ const BreathFirstSearchAnimations = ({
     getColor() {
       return this.searched ? "green" : edgeNormColor;
     }
+  }
+
+  const functionMap = {
+    colorEdge: async (set) => {
+      await colorEdge(set);
+    },
+    setVisited: async (index) => {
+      await setVisited(index);
+    },
+    Log: (str) => {
+      Log(str);
+    },
+    setisAnimating: (bool) => {
+      setisAnimating(bool);
+    },
+  };
+
+  //sends if its animiting
+  const sendisAnimating = () => {
+    setAnimating(isAnimating);
+  };
+
+  //sets isAnimating useeffect and ref
+  function changeIsAnimating(bool) {
+    setisAnimating(bool);
+    isAnimatingRef.current = bool;
   }
 
   function getRandomNum(min, max) {
@@ -203,6 +233,34 @@ const BreathFirstSearchAnimations = ({
     return tempGraph;
   }
 
+  //set visited helper function
+  function setVisited(index) {
+    return new Promise((resolve) => {
+      graph[0][index].Searched();
+
+      setGraph(copyGraph(graph));
+      setTimeout(
+        () => {
+          resolve();
+        },
+        mapNumber(speed, 100, 1, 750, 2000),
+      );
+    });
+  }
+
+  //color the edge helper function
+  function colorEdge(set) {
+    return new Promise((resolve) => {
+      let i = get(graph[1][set[0]], graph[0][set[1]].data);
+      graph[1][set[0]][i].Searched();
+      setGraph(copyGraph(graph));
+      i = get(graph[1][set[1]], graph[0][set[0]].data);
+      graph[1][set[1]][i].Searched();
+      setGraph(copyGraph(graph));
+      resolve();
+    });
+  }
+
   function bfs(startNode) {
     const visited = new Set(); // To track visited nodes
     const queue = [startNode]; // Initialize the queue with the start node index
@@ -241,6 +299,42 @@ const BreathFirstSearchAnimations = ({
     return [result, traversedEdges];
   }
 
+  function setAnimations() {
+    return new Promise((resolve) => {
+      //clear the graph
+      clear();
+
+      //create the array of the order of searched nodes and edges
+      const bfsTraversalList = bfs(rootNode)[0];
+      const bfsEdgeTraversalList = bfs(rootNode)[1];
+
+      animationQueue.push(["setVisited", bfsTraversalList[0]]);
+      for (let i = 1; i < bfsTraversalList.length; i++) {
+        animationQueue.push(["colorEdge", bfsEdgeTraversalList[i - 1]]);
+        animationQueue.push(["setVisited", bfsTraversalList[i]]);
+      }
+
+      animationQueue.push(["Log", "Searched"]);
+      animationQueue.push(["setisAnimating", false]);
+
+      resolve();
+    });
+  }
+
+  //goes through the animation queue on where ever it left off
+  async function sort() {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    //while paused hasnt been pressed (isAnimating) go through the animation queue
+    while (animationQueue.length && isAnimatingRef.current) {
+      //save the instruction string
+      const func = animationQueue.shift();
+      const args = func.splice(1);
+
+      //console.log(func);
+      await functionMap[func](...args);
+    }
+  }
+
   //function that maps a value
   function mapNumber(value, inMin, inMax, outMin, outMax) {
     if (inMin === inMax) {
@@ -252,7 +346,7 @@ const BreathFirstSearchAnimations = ({
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       let tempGraph = [[], new Array(maxArrsize).fill().map(() => [])];
 
       //creats a list of vertex's
@@ -268,7 +362,6 @@ const BreathFirstSearchAnimations = ({
 
       tempGraph[1] = generateRandomSpanningTree(tempGraph[0]);
 
-      console.log(tempGraph);
       setGraph(tempGraph);
       Log("Set to a Random Graph ");
     }
@@ -276,65 +369,34 @@ const BreathFirstSearchAnimations = ({
 
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       clear();
     }
   }, [Clear]);
+
+  //Handels when pause button is pressed
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      Log("Paused");
+
+      changeIsAnimating(false);
+    }
+  }, [Pause]);
 
   //handels any sorting
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
       if (graph[0].length != 0) {
-        setisAnimating(true);
-
-        //clear the graph
-        clear();
-
-        const bfsTraversalList = bfs(rootNode)[0];
-        const bfsEdgeTraversalList = bfs(rootNode)[1];
-        console.log(bfs(rootNode));
-
-        //set visited helper function
-        function setVisited(index, edge) {
-          return new Promise((resolve) => {
-            setTimeout(
-              () => {
-                graph[0][index].Searched();
-
-                setGraph(copyGraph(graph));
-                resolve();
-              },
-              mapNumber(speed, 100, 1, 750, 2000),
-            );
-          });
+        changeIsAnimating(true);
+        if (!animationQueue.length) {
+          (async () => {
+            await setAnimations();
+          })();
+          sort();
+        } else {
+          Log("Resumed");
+          sort();
         }
-
-        //color the edge helper function
-        function colorEdge(set) {
-          return new Promise((resolve) => {
-            let i = get(graph[1][set[0]], graph[0][set[1]].data);
-            graph[1][set[0]][i].Searched();
-            setGraph(copyGraph(graph));
-            i = get(graph[1][set[1]], graph[0][set[0]].data);
-            graph[1][set[1]][i].Searched();
-            setGraph(copyGraph(graph));
-            resolve();
-          });
-        }
-
-        // Function that processes each element in the array with a delay
-        async function processArrayWithDelay() {
-          await setVisited(bfsTraversalList[0]); //visit the node
-          for (let i = 1; i < bfsTraversalList.length; i++) {
-            await setVisited(bfsTraversalList[i]); //visit the node
-            await colorEdge(bfsEdgeTraversalList[i - 1]);
-          }
-
-          Log("Searchd!");
-          setisAnimating(false);
-        }
-
-        processArrayWithDelay();
       } else {
         Log("Error: Cannot search empty graph!");
       }
@@ -366,8 +428,9 @@ const BreathFirstSearchAnimations = ({
 
   //handles the resize of the cavas when there is a change in the height
   useEffect(() => {
+    sendisAnimating();
+
     const canvas = canvasRef.current;
-    // const context = canvas.getContext("2d");
     if (canvas) {
       canvas.height = height - 3;
       canvas.width = windowWidth - menuWidth;

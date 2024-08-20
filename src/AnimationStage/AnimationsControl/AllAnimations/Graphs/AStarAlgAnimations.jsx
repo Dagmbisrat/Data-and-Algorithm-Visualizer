@@ -10,6 +10,8 @@ const AStarAlgAniamtions = ({
   menuWidth,
   Log,
   Search,
+  Pause,
+  setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
@@ -17,11 +19,13 @@ const AStarAlgAniamtions = ({
   const rootNode = 0;
   const targetNode = maxArrsize - 1;
   const [isAnimating, setisAnimating] = useState(false);
+  const isAnimatingRef = useRef(isAnimating);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [graph, setGraph] = useState([
     [],
     new Array(maxArrsize).fill().map(() => []),
   ]);
+  const [animationQueue, setAnimationQueue] = useState([]);
   const maxEdgeWeight = 50;
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
   const normalColor = "gray";
@@ -39,6 +43,13 @@ const AStarAlgAniamtions = ({
       this.label = "";
       this.type = "Normal";
       this.Heuristic = "";
+      this.borderColor = "black";
+    }
+    SearchingThroughNode() {
+      this.borderColor = "red";
+    }
+    UnSearchingThroughNode() {
+      this.borderColor = "black";
     }
     Searched() {
       this.searched = true;
@@ -101,6 +112,45 @@ const AStarAlgAniamtions = ({
     }
   }
 
+  const functionMap = {
+    clear: (bool) => {
+      clear(bool);
+    },
+    setNodeDistances: async (gScore, fScore) => {
+      await setNodeDistances(gScore, fScore);
+    },
+    colorEdge: async (set, color, bool) => {
+      await colorEdge(set, color, bool);
+    },
+    setVisited: async (index) => {
+      await setVisited(index);
+    },
+    setBorderColor: (index) => {
+      setBorderColor(index);
+    },
+    Log: (str) => {
+      if (str == "end") {
+        Log(`Path Found with the Length of ${graph[0][targetNode].label}!`);
+      } else {
+        Log(str);
+      }
+    },
+    setisAnimating: (bool) => {
+      setisAnimating(bool);
+    },
+  };
+
+  //sends if its animiting
+  const sendisAnimating = () => {
+    setAnimating(isAnimating);
+  };
+
+  //sets isAnimating useeffect and ref
+  function changeIsAnimating(bool) {
+    setisAnimating(bool);
+    isAnimatingRef.current = bool;
+  }
+
   function getRandomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -118,6 +168,7 @@ const AStarAlgAniamtions = ({
           label: graph[0][i].label,
           Heuristic: graph[0][i].Heuristic,
           shape: graph[0][i].getShape(),
+          borderColor: graph[0][i].borderColor,
         },
         position: { x: graph[0][i].position.x, y: graph[0][i].position.y },
       });
@@ -157,59 +208,10 @@ const AStarAlgAniamtions = ({
     return false;
   }
 
-  function generateRandomSpanningTree(vertices) {
-    let nodes = [...Array(vertices.length).keys()]; //array of all the nodes
-    let visited = nodes.splice(getRandomNum(0, maxArrsize - 1), 1); //array of all the visited nodes
-    let edges = new Array(maxArrsize).fill().map(() => []);
+  function setBorderColor(index) {
+    graph[0][index].SearchingThroughNode();
 
-    function addEdge(node1, node2) {
-      // console.log(node1);
-      // console.log(node2);
-      edges[node1].push(
-        new Edge(
-          vertices[node2].data,
-          getRandomNum(-maxEdgeWeight, maxEdgeWeight),
-        ),
-      );
-      // console.log(edges);
-    }
-
-    while (nodes.length) {
-      // console.log(nodes);
-      // console.log(visited);
-      let node1 = nodes.splice(getRandomNum(0, nodes.length - 1), 1)[0]; //get a random node from the unvisited
-      let node2 = visited[getRandomNum(0, visited.length - 1)]; //get a random node from the visited
-      visited.push(node1); //add to the visited
-
-      addEdge(node1, node2);
-    }
-
-    function getWeight(array, data) {
-      for (const edge of array) {
-        if (edge.data == data) {
-          return edge.weight;
-        }
-      }
-
-      return 0;
-    }
-
-    //turn it into a proper adjacency list
-    for (let i = 0; i < maxArrsize; i++) {
-      const nodeData = vertices[i].data; //gets the node we are lokking for
-
-      for (let j = 0; j < maxArrsize; j++) {
-        //goes through the whole list
-        if (i != j && has(edges[j], nodeData)) {
-          //if the array contains node
-          edges[i].push(
-            new Edge(vertices[j].data, getWeight(edges[j], nodeData)),
-          ); //add the node that has the selected node in its list to the list for the selected node
-        }
-      }
-    }
-
-    return edges;
+    setGraph(copyGraph(graph));
   }
 
   function getRandomCharacter() {
@@ -221,6 +223,7 @@ const AStarAlgAniamtions = ({
     if (graph[0].length) {
       for (const nodes of graph[0]) {
         nodes.UnSearched();
+        nodes.UnSearchingThroughNode();
         if (all) {
           nodes.label = "";
           nodes.Heuristic = "";
@@ -257,11 +260,27 @@ const AStarAlgAniamtions = ({
       copy.label = node.label;
       copy.type = node.type;
       copy.Heuristic = node.Heuristic;
+      copy.borderColor = node.borderColor;
 
       tempGraph[0].push(copy);
     }
     tempGraph[1] = graph[1];
     return tempGraph;
+  }
+
+  //set visited helper function
+  function setVisited(index) {
+    return new Promise((resolve) => {
+      setTimeout(
+        () => {
+          graph[0][index].Searched();
+
+          setGraph(copyGraph(graph));
+          resolve();
+        },
+        mapNumber(speed, 100, 1, 750, 2000),
+      );
+    });
   }
 
   //color the edge helper function
@@ -331,6 +350,11 @@ const AStarAlgAniamtions = ({
     return path.reverse();
   }
 
+  //returns a deep copy of array of obj's
+  function deepCopyArrayOfObjects(arr) {
+    return JSON.parse(JSON.stringify(arr));
+  }
+
   async function aStar(start, goal) {
     return new Promise(async (resolve) => {
       // Initialization
@@ -352,7 +376,12 @@ const AStarAlgAniamtions = ({
       fScore[start] = heuristic(start, goal);
 
       //set the nodes distnaces
-      await setNodeDistances(gScore, fScore);
+      //await setNodeDistances(gScore, fScore);
+      animationQueue.push([
+        "setNodeDistances",
+        deepCopyArrayOfObjects(gScore),
+        deepCopyArrayOfObjects(fScore),
+      ]);
 
       // A* Algorithm
       while (!openSet.isEmpty()) {
@@ -367,6 +396,9 @@ const AStarAlgAniamtions = ({
           return Promise.resolve(resolve([path, traversedEdges]));
         }
 
+        //set the current node border red
+        animationQueue.push(["setBorderColor", current]);
+
         // Check each neighbor of the current node
         for (const neighbor of graph[1][current]) {
           const neighborNode = get(graph[0], neighbor.data);
@@ -374,7 +406,13 @@ const AStarAlgAniamtions = ({
           const tentativeGScore = gScore[current] + weight;
 
           //color the neighbor edge since the path is
-          await colorEdge([current, neighborNode], "red", true);
+          // await colorEdge([current, neighborNode], "red", true);
+          animationQueue.push([
+            "colorEdge",
+            [current, neighborNode],
+            "red",
+            true,
+          ]);
 
           if (tentativeGScore < gScore[neighborNode]) {
             cameFrom[neighborNode] = current;
@@ -383,15 +421,72 @@ const AStarAlgAniamtions = ({
               gScore[neighborNode] + heuristic(neighborNode, goal);
 
             //set the nodes distnaces
-            await setNodeDistances(gScore, fScore);
+            //await setNodeDistances(gScore, fScore);
+            animationQueue.push([
+              "setNodeDistances",
+              deepCopyArrayOfObjects(gScore),
+              deepCopyArrayOfObjects(fScore),
+            ]);
 
             openSet.enqueue(fScore[neighborNode], neighborNode);
           }
         }
         //clear the graph
-        clear(false);
+        //clear(false);
+        animationQueue.push(["clear", false]);
       }
     });
+  }
+
+  function setAnimations() {
+    return new Promise(async (resolve) => {
+      //clear the graph
+      clear(true);
+
+      Log(
+        "Fiding path from " +
+          graph[0][rootNode].data +
+          " to " +
+          graph[0][targetNode].data,
+      );
+
+      const answerArr = await aStar(rootNode, targetNode);
+
+      const traversalList = answerArr[0];
+      const edgeTraversalList = answerArr[1];
+
+      //visit the node
+      animationQueue.push(["setVisited", traversalList[0]]);
+      for (let i = 1; i < traversalList.length; i++) {
+        //visit the node
+        animationQueue.push(["setVisited", traversalList[i]]);
+        animationQueue.push([
+          "colorEdge",
+          edgeTraversalList[i - 1],
+          "green",
+          true,
+        ]);
+      }
+
+      animationQueue.push(["Log", "end"]);
+      animationQueue.push(["setisAnimating", false]);
+
+      resolve();
+    });
+  }
+
+  //goes through the animation queue on where ever it left off
+  async function sort() {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    //while paused hasnt been pressed (isAnimating) go through the animation queue
+    while (animationQueue.length && isAnimatingRef.current) {
+      //save the instruction string
+      const func = animationQueue.shift();
+      const args = func.splice(1);
+
+      //console.log(func);
+      await functionMap[func](...args);
+    }
   }
 
   //function that maps a value
@@ -405,7 +500,7 @@ const AStarAlgAniamtions = ({
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       let tempGraph = [[], new Array(maxArrsize).fill().map(() => [])];
 
       //creats a list of vertex's
@@ -453,7 +548,6 @@ const AStarAlgAniamtions = ({
         }
       }
 
-      console.log(tempGraph);
       setGraph(tempGraph);
       Log("Set to a Random Graph ");
     }
@@ -461,62 +555,33 @@ const AStarAlgAniamtions = ({
 
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       clear(true);
     }
   }, [Clear]);
+
+  //Handels when pause button is pressed
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      Log("Paused");
+      changeIsAnimating(false);
+    }
+  }, [Pause]);
 
   //handels any sorting
   useEffect(() => {
     if (isMounted.current && !isAnimating) {
       if (graph[0].length != 0) {
-        setisAnimating(true);
-
-        //clear the graph
-        clear(true);
-
-        //set visited helper function
-        function setVisited(index) {
-          return new Promise((resolve) => {
-            setTimeout(
-              () => {
-                graph[0][index].Searched();
-
-                setGraph(copyGraph(graph));
-                resolve();
-              },
-              mapNumber(speed, 100, 1, 750, 2000),
-            );
-          });
+        changeIsAnimating(true);
+        if (!animationQueue.length) {
+          (async () => {
+            await setAnimations();
+          })();
+          sort();
+        } else {
+          Log("Resumed");
+          sort();
         }
-
-        // Function that processes each element in the array with a delay
-        async function processArrayWithDelay() {
-          Log(
-            "Fiding path from " +
-              graph[0][rootNode].data +
-              " to " +
-              graph[0][targetNode].data,
-          );
-
-          const answerArr = await aStar(rootNode, targetNode);
-
-          const traversalList = answerArr[0];
-          const edgeTraversalList = answerArr[1];
-
-          await setVisited(traversalList[0]); //visit the node
-          for (let i = 1; i < traversalList.length; i++) {
-            await setVisited(traversalList[i]); //visit the node
-            await colorEdge(edgeTraversalList[i - 1], "green", true);
-          }
-
-          Log(
-            "Path Found with the length of " + graph[0][targetNode].label + "!",
-          );
-          setisAnimating(false);
-        }
-
-        processArrayWithDelay();
       } else {
         Log("Error: Cannot search empty graph!");
       }
@@ -548,6 +613,9 @@ const AStarAlgAniamtions = ({
 
   //handles the resize of the cavas when there is a change in the height
   useEffect(() => {
+    sendisAnimating();
+    console.log(graph);
+
     const canvas = canvasRef.current;
     // const context = canvas.getContext("2d");
     if (canvas) {
@@ -572,6 +640,7 @@ const AStarAlgAniamtions = ({
               shape: "data(shape)",
               width: "30",
               height: "30",
+              "border-color": "data(borderColor)", // outline
               "background-color": "data(color)",
             },
           },
@@ -598,7 +667,7 @@ const AStarAlgAniamtions = ({
               "text-margin-y": "20px", // Adjust this value to position the label
               "font-size": "12px",
               "font-weight": "bold",
-              "border-color": "black", // white outline
+              "border-color": "data(borderColor)", // outline
               "border-width": "1px", // thickness of the outline
               "border-style": "solid", // style of the outline
               label: function (ele) {
@@ -615,7 +684,7 @@ const AStarAlgAniamtions = ({
               "text-margin-y": "45px", // Adjust this value to position the label
               "font-size": "12px",
               "font-weight": "bold",
-              "border-color": "black", // white outline
+              "border-color": "data(borderColor)", // outline
               "border-width": "1px", // thickness of the outline
               "border-style": "solid", // style of the outline
               label: function (ele) {

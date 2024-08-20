@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { cloneWith } from "lodash";
 
 const BubbleSortAnimations = ({
   speed,
@@ -13,13 +12,16 @@ const BubbleSortAnimations = ({
   menuWidth,
   Log,
   Sort,
+  Pause,
   setAnimating,
 }) => {
   const canvasRef = useRef(null);
   const isMounted = useRef(false);
   const [isAnimating, setisAnimating] = useState(false);
+  const isAnimatingRef = useRef(isAnimating);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [arr, setArr] = useState([]);
+  const [animationQueue, setAnimationQueue] = useState([]);
   const minBoxHight = 0.1; //the minimum box hight (as a percentage of tecanvas hight)
   const maxBoxHight = 0.8; //the Max box hight (as a percentage of the canvas hight)
   const maxArrsize = 15;
@@ -32,8 +34,16 @@ const BubbleSortAnimations = ({
 
   //the class that represents the box's'
   class Box {
-    constructor(value) {
-      this.value = value;
+    constructor(value, x, y) {
+      if (arguments.length == 1) {
+        this.value = value;
+        this.color = normalColor;
+      } else {
+        this.value = value;
+        this.color = normalColor;
+        this.x = x;
+        this.y = y;
+      }
     }
     setX(x) {
       this.x = x;
@@ -41,25 +51,25 @@ const BubbleSortAnimations = ({
     setY(y) {
       this.y = y;
     }
+    setColor(color) {
+      this.color = color;
+    }
     moveX(value) {
       this.x += value;
     }
-
     setSorted() {
       this.sorted = true;
     }
-
     setUnSorted() {
       this.sorted = false;
     }
-
     equals(box) {
       return this.value == box.value && this.x == box.x && this.y == box.y;
     }
 
-    draw(canvas, context, color) {
+    draw(canvas, context) {
       //draw the box
-      context.fillStyle = this.sorted ? "green" : color;
+      context.fillStyle = this.sorted ? "green" : this.color;
       context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
       context.strokeStyle = "white"; // Use the boxColor prop
       context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
@@ -70,63 +80,80 @@ const BubbleSortAnimations = ({
     }
   }
 
+  const functionMap = {
+    setColors: (i, j) => {
+      arr[i].setColor(hilightedColor);
+      arr[j].setColor(hilightedColor);
+    },
+    setSortedAll: () => {
+      setSortedAll();
+    },
+    animateSwap: async (i, j) => {
+      await animateSwap(arr[i], arr[j]);
+    },
+    Log: (str) => {
+      Log(str);
+    },
+    setisAnimating: (bool) => {
+      setisAnimating(bool);
+    },
+  };
+
   //sends if its animiting
   const sendisAnimating = () => {
     setAnimating(isAnimating);
   };
 
-  function clear() {
+  function clear(ignoreSort) {
     return new Promise((resolve) => {
       for (const box of arr) {
-        box.setUnSorted();
+        if (!ignoreSort) box.setUnSorted();
+        box.setColor(normalColor);
       }
       resolve(setArr(arr));
     });
   }
 
-  //Animates comparing two box's
-  function animateCompare(box1, box2) {
-    return new Promise((resolve) => {
-      const canvas = canvasRef.current;
-      const context = canvasRef.current.getContext("2d");
-      let frameCounter = 0;
-
-      //draw the array logic
-      function drawFrame() {
-        //clean the canvas
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        //display the array
-        for (const box of arr) {
-          //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          if (box.equals(box1) || box.equals(box2)) {
-            box.draw(canvas, context, hilightedColor);
-          } else {
-            box.draw(canvas, context, normalColor);
-          }
-        }
-
-        //incrament the frame counter
-        frameCounter++;
-
-        // Check if the max frames limit is reached
-        if (frameCounter < maxFrames - speed / 2) {
-          // Request the next frame
-          requestAnimationFrame(drawFrame);
-          //console.log("frame played");
-        } else {
-          // Reset the frame counter and stop the animation
-          for (const box of arr) {
-            box.draw(canvas, context, normalColor);
-          }
-          //console.log("Animation complete");
-          resolve();
-        }
-      }
-
-      drawFrame();
-    });
+  //helper function that just draws then arr
+  function draw() {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    for (const box of arr) {
+      box.draw(canvas, context);
+    }
   }
+
+  //helper function that sorts all the box's in the arr
+  function setSortedAll() {
+    for (let i = 0; i < arr.length; i++) {
+      arr[i].setSorted();
+    }
+  }
+
+  //sends a copy of the array
+  function copyArr() {
+    const temp = [];
+    for (let i = 0; i < arr.length; i++) {
+      temp.push(new Box(arr[i].value, arr[i].x, arr[i].y));
+      temp[i].setColor(arr[i].color);
+    }
+    return temp;
+  }
+
+  //finds the indexof a box in the arr
+  function indexArr(box) {
+    for (let i = 0; i < arr.length; i++) {
+      if (box.equals(arr[i])) return i;
+    }
+  }
+
+  //sets isAnimating useeffect and ref
+  function changeIsAnimating(bool) {
+    setisAnimating(bool);
+    isAnimatingRef.current = bool;
+  }
+
   //Animate the Swap
   function animateSwap(box1, box2) {
     return new Promise((resolve) => {
@@ -135,9 +162,12 @@ const BubbleSortAnimations = ({
       const distanceApart = Math.abs(box1.x - box2.x);
       const incramentValue = distanceApart / (maxFrames - speed / 2);
       const isBox1RightofBox2 = box1.x > box2.x;
+      const j = indexArr(box1);
+      const i = indexArr(box2);
       let frameCounter = 0;
-
-      //console.log(speed);
+      arr[i].setColor(hilightedColor);
+      arr[j].setColor(hilightedColor);
+      draw();
 
       function drawFrame() {
         //clean the canvas
@@ -156,11 +186,8 @@ const BubbleSortAnimations = ({
 
         //display the array
         for (const box of arr) {
-          //cheak if the box your at is either box 1 or box 2 then display it with a diffrent color
-          box.draw(canvas, context, normalColor);
+          box.draw(canvas, context);
         }
-        box1.draw(canvas, context, hilightedColor);
-        box2.draw(canvas, context, hilightedColor);
 
         //incrament the frame counter
         frameCounter++;
@@ -169,13 +196,9 @@ const BubbleSortAnimations = ({
         if (frameCounter < maxFrames - speed / 2) {
           // Request the next frame
           requestAnimationFrame(drawFrame);
-          //console.log("frame played");
+          //console.log("next frame");
         } else {
-          // Reset the frame counter and stop the animation
-          for (const box of arr) {
-            box.draw(canvas, context, normalColor);
-          }
-          //console.log("swap complete");
+          swap(arr, j, i);
           resolve();
         }
       }
@@ -183,41 +206,75 @@ const BubbleSortAnimations = ({
     });
   }
 
-  async function play() {
-    //clear the of any colors before sorting
-    await clear();
+  //goes through the animation queue on where ever it left off
+  async function sort() {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    //while paused hasnt been pressed (isAnimating) go through the animation queue
+    while (animationQueue.length && isAnimatingRef.current) {
+      clear(true);
+      const func = animationQueue.shift();
+      const args = func.splice(1);
 
-    setisAnimating(true); //first set animating to true
-    let n = arr.length;
-    for (let i = 0; i < n - 1; i++) {
-      let swapped = false;
-      for (let j = 0; j < n - 1 - i; j++) {
-        //play the animation that compare
-        await animateCompare(arr[j], arr[j + 1]);
-        if (arr[j].value > arr[j + 1].value) {
-          //play the swap animation and swap elements
-          await animateSwap(arr[j], arr[j + 1]);
-          let tmpArr = arr;
-          let temp = tmpArr[j];
-          tmpArr[j] = tmpArr[j + 1];
-          tmpArr[j + 1] = temp;
-          setArr(tmpArr);
-          swapped = true;
-        }
+      //console.log(func);
+      functionMap[func](...args);
+      draw();
+      if (animationQueue.length >= 2) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1500 - 14.5 * speed),
+        );
+      } else {
+        await new Promise((resolve) => setTimeout(resolve, 10));
       }
-      // If no two elements were swapped in the inner loop, then the array is sorted
-      if (!swapped) break;
     }
+  }
 
-    const canvas = canvasRef.current;
-    const context = canvasRef.current.getContext("2d");
+  function swap(arr, j, i) {
+    let tmpArr = arr;
+    let temp = tmpArr[j];
+    tmpArr[j] = tmpArr[i];
+    tmpArr[i] = temp;
+    setArr(tmpArr);
+    setArr(copyArr());
+  }
 
-    for (let i = 0; i < arr.length; i++) {
-      arr[i].setSorted();
-      arr[i].draw(canvas, context, normalColor);
-    }
-    setisAnimating(false); //first set animating to true
-    Log("sorted");
+  //sets the animation queue for the spesific arr
+  function setAnimations() {
+    return new Promise((resolve) => {
+      clear(false);
+      const tempArr = copyArr();
+
+      let n = tempArr.length;
+      for (let i = 0; i < n - 1; i++) {
+        let swapped = false;
+        for (let j = 0; j < n - 1 - i; j++) {
+          //play the animation that compare
+          animationQueue.push(["setColors", j, j + 1]);
+
+          //await animateCompare(tempArr[j], tempArr[j + 1]);
+          if (tempArr[j].value > tempArr[j + 1].value) {
+            //play the swap animation and swap elements
+
+            animationQueue.push(["animateSwap", j, j + 1]);
+
+            //swap
+            let temp = tempArr[j];
+            tempArr[j] = tempArr[j + 1];
+            tempArr[j + 1] = temp;
+
+            swapped = true;
+          }
+        }
+        // If no two elements were swapped in the inner loop, then the array is sorted
+        if (!swapped) break;
+      }
+
+      animationQueue.push(["setSortedAll", null]);
+      animationQueue.push(["Log", "sorted"]);
+      //animation is done
+      animationQueue.push(["setisAnimating", false]);
+
+      resolve();
+    });
   }
 
   //function that maps a value
@@ -269,7 +326,7 @@ const BubbleSortAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes shure there isnt any annimations going on
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       //checks if the input is valid
       if (Input == "") {
         Log("Input empty");
@@ -287,7 +344,7 @@ const BubbleSortAnimations = ({
   useEffect(() => {
     //checks if the canvas has alredy mounted so that the use effect dosent run on mount
     //And also makes sure there isnt any annimations going on
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       //checks if arr is empty
       if (arr.length < 1) {
         Log("Cannot remove: Array is Empty");
@@ -303,9 +360,10 @@ const BubbleSortAnimations = ({
 
   //Sets a Random set of arrays for arr
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       var array = [];
-      for (var i = 0; i < maxArrsize; i++) {
+      const ranNum = Math.floor(Math.random() * maxArrsize) + 2;
+      for (var i = 0; i < ranNum; i++) {
         array.push(
           new Box(Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt),
         );
@@ -317,11 +375,22 @@ const BubbleSortAnimations = ({
 
   //Handles when clear is pressed (The array is cleard)
   useEffect(() => {
-    if (isMounted.current && !isAnimating) {
+    if (isMounted.current && !animationQueue.length) {
       setArr([]);
       Log("Cleard!");
     }
   }, [Clear]);
+
+  //Handels when pause button is pressed
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      //Makes shure multiple clickes wont be registed at once
+
+      Log("Paused");
+      //console.log("Paused");
+      changeIsAnimating(false);
+    }
+  }, [Pause]);
 
   //handels any sorting
   useEffect(() => {
@@ -329,12 +398,34 @@ const BubbleSortAnimations = ({
     // check if its alredy animation
     if (isMounted.current && !isAnimating) {
       if (arr.length > 0) {
-        play();
+        //set the animation to true
+        changeIsAnimating(true);
+        //if animationqueue is empty it should set the queue then run through the queue
+        if (!animationQueue.length) {
+          (async () => {
+            await setAnimations();
+            //console.log(animationQueue);
+          })();
+          sort();
+        } else {
+          //if the animation queue isnt full then it should continue runing through the queue
+          Log("Resumed");
+          sort();
+        }
       } else {
         Log("Error: Cannot Sort an Empty Array");
       }
     }
   }, [Sort]);
+
+  //pauses the animation if teh windown is changed when animating
+  useEffect(() => {
+    if (isMounted.current && isAnimating) {
+      Log("Paused");
+
+      changeIsAnimating(false);
+    }
+  }, [menuWidth, windowWidth]);
 
   // chages the windowWidth when window width changes
   useEffect(() => {
@@ -370,9 +461,7 @@ const BubbleSortAnimations = ({
       context.clearRect(0, 0, canvas.width, canvas.height);
       //updates the x and y values then redraws them
       updateAll();
-      for (const box of arr) {
-        box.draw(canvas, context, normalColor);
-      }
+      draw();
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);
 
