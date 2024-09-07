@@ -23,7 +23,7 @@
     text-align: center;
 }
 .random-button {
-    background-color: #413f3f;
+    background-color: #1e1e1e;
     color: #d1cdcd;
     border: none;
     padding: 6px 16px;
@@ -34,7 +34,7 @@
     cursor: pointer;
 }
 .random-button:hover {
-    background: #454545;
+    background-color: #222222;
 }
 
 .random-icon {
@@ -46,7 +46,7 @@
     outline: none;
 }
 .clear-button {
-    background-color: #413f3f;
+    background-color: #1e1e1e;
     color: #d1cdcd;
     border: none;
     padding: 7px 16px;
@@ -58,7 +58,7 @@
     cursor: pointer;
 }
 .clear-button:hover {
-    background: #454545;
+    background-color: #222222;
 }
 
 .clear-icon {
@@ -72,7 +72,7 @@
 
 .sort-button {
     margin: 0px;
-    background-color: #413f3f;
+    background-color: #1e1e1e;
     color: #d1cdcd;
     border: none;
     padding: 7px 16px;
@@ -83,7 +83,7 @@
     cursor: pointer;
 }
 .sort-button:hover {
-    background: #454545;
+    background-color: #222222;
 }
 
 .play-icon {
@@ -106,7 +106,7 @@
     padding-right: 13px;
 }
 .slider-container:hover {
-    background: #454545;
+    background: #222222;
 }
 .slider-container label {
     margin-right: 5px;

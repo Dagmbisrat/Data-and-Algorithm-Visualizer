@@ -1,9 +1,7 @@
 import { useRef, useEffect, useState } from "react";
-import "./QueuesAnimation.css";
 import PropTypes from "prop-types";
 
 const QueuesAnimation = ({
-  speed,
   height,
   Queue,
   UnQueue,
@@ -213,7 +211,7 @@ const QueuesAnimation = ({
       drawTailandHead(canvas, context);
     }
   }, [height, windowWidth, menuWidth, queue]);
-  return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 export default QueuesAnimation;
 QueuesAnimation.prototype = {

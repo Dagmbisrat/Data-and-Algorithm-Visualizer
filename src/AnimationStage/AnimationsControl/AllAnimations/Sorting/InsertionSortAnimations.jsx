@@ -32,8 +32,9 @@ const InsertionSortAnimations = ({
   const maxInt = 99;
   const minInt = -99;
   const maxFrames = 60;
-  const normalColor = "gray";
-  const hilightedColor = "red";
+  const normalColor = "#484848";
+  const hilightedColor = "#800000";
+  const sortedColor = "#228B22";
 
   //the class that represents the box's'
   class Box {
@@ -76,7 +77,7 @@ const InsertionSortAnimations = ({
 
     draw(canvas, context) {
       //draw the box
-      context.fillStyle = this.sorted ? "green" : this.color;
+      context.fillStyle = this.sorted ? sortedColor : this.color;
       context.fillRect(this.x, this.y, boxWidth, canvas.height - this.y);
       context.strokeStyle = "white"; // Use the boxColor prop
       context.strokeRect(this.x, this.y, boxWidth, canvas.height - this.y);
@@ -638,7 +639,7 @@ const InsertionSortAnimations = ({
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);
 
-  return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 export default InsertionSortAnimations;
 InsertionSortAnimations.prototype = {

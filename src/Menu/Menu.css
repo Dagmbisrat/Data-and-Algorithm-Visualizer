@@ -4,7 +4,7 @@
     left: 0;
     bottom: 0;
     right: auto;
-    background-color: #413f3f;
+    background-color: #1e1e1e; #413f3f
     overflow: hidden;
     display: flex;
 }
@@ -17,7 +17,7 @@
     cursor: col-resize;
 }
 .dropdown-menu {
-    background-color: #413f3f;
+    background-color: #1e1e1e; #413f3f
     color: #fff;
     font-family: Arial, sans-serif;
 }
@@ -34,11 +34,11 @@
 }
 
 .menu-title:hover {
-    background-color: #444;
+    background-color: #121212;
 }
 
 .submenu {
-    background-color: #444;
+    background-color: #1e1e1e;
 }
 
 .submenu-item {
@@ -47,7 +47,7 @@
 }
 
 .submenu-item:hover {
-    background-color: #555;
+    background-color: #151515;
 }
 .extra {
     overflow: hidden; /* Hide overflowing content */

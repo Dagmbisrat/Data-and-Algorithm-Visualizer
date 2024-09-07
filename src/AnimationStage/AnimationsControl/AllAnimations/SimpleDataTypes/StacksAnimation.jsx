@@ -1,9 +1,7 @@
 import { useRef, useEffect, useState } from "react";
-import "./StacksAnimation.css";
 import PropTypes from "prop-types";
 
 const StacksAnimations = ({
-  speed,
   height,
   Push,
   Pop,
@@ -159,7 +157,7 @@ const StacksAnimations = ({
     }
   }, [height, windowWidth, menuWidth, stack]);
 
-  return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 export default StacksAnimations;
 StacksAnimations.prototype = {

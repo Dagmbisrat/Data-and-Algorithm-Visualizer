@@ -33,8 +33,9 @@ const HeapSortAnimations = ({
   const minInt = -99;
   const maxFrames = 60;
   const xspaceBetween = 70;
-  const normalColor = "gray";
-  const hilightedColor = "red";
+  const normalColor = "#484848";
+  const hilightedColor = "#800000";
+  const sortedColor = "#228B22";
 
   //the class that represents the box's'
   class Box {
@@ -73,7 +74,7 @@ const HeapSortAnimations = ({
     draw(context, color) {
       if (this.display) {
         //draw the box
-        context.fillStyle = this.sorted ? "green" : color;
+        context.fillStyle = this.sorted ? sortedColor : color;
         context.fillRect(this.x, this.y, boxWidth, boxWidth);
         context.strokeStyle = "white"; // Use the boxColor prop
         context.strokeRect(this.x, this.y, boxWidth, boxWidth);
@@ -91,7 +92,7 @@ const HeapSortAnimations = ({
     drawinHeap(context, color) {
       if (this.display) {
         //draw the full circle
-        context.fillStyle = this.sorted ? "green" : color;
+        context.fillStyle = this.sorted ? sortedColor : color;
         context.beginPath();
         context.arc(this.x, this.y, radius, 0, 2 * Math.PI);
         context.fill();
@@ -654,7 +655,7 @@ const HeapSortAnimations = ({
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating]);
 
-  return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 
 export default HeapSortAnimations;

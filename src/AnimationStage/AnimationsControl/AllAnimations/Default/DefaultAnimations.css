@@ -1,10 +1,48 @@
-.main {
-    display: flex;
-    align-items: center; /* Center vertically */
-    justify-content: center; /* Center horizontally (optional) */
-    padding-right: 180px;
+.page-body {
+    background-color: #121212; /* Dark gray background instead of pure black */
+    color: #ffffff;
     font-family: Arial, sans-serif;
-    font-size: 22px;
-    height: 100%;
-    background-color: #272525;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto; /* Enable vertical scrolling */
+    height: 100vh; /* Full viewport height */
+}
+
+.page-header {
+    background-color: #1e1e1e; /* Slightly lighter than #121212 */
+    padding: 20px;
+    text-align: center;
+}
+.Header-Txt {
+    color: white;
+}
+
+h1 {
+    color: #ffb74d;
+}
+
+.page-main {
+    padding: 20px;
+    width: 80%; /* Full width up to max-width */
+}
+
+section {
+    margin-bottom: 20px;
+    border: 1px solid #444444; /* Lighter gray border */
+    padding: 15px;
+    background-color: #1f1f1f; /* Slightly lighter than #121212 */
+    border-radius: 8px;
+}
+
+h2 {
+    color: #ffb74d;
+}
+
+p {
+    line-height: 1.6;
+    color: #ffffff;
+}
+
+strong {
+    color: #ffb74d;
 }

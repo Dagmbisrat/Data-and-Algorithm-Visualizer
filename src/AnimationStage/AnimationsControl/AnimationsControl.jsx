@@ -16,7 +16,6 @@ import AStarAlgAniamtions from "./AllAnimations/Graphs/AStarAlgAnimations.jsx";
 import DefaultScreen from "./AllAnimations/Default/DefaultAnimations.jsx";
 import LinearSearchAnimations from "./AllAnimations/Searching/LinearSearchAnimations.jsx";
 import BinarySearchAnimations from "./AllAnimations/Searching/BinarySearchAnimations.jsx";
-import TestAnimations from "../../../test.jsx";
 
 const Animations = ({
   Animation_name,

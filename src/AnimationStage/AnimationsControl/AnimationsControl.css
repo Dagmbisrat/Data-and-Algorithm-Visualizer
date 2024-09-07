@@ -1,5 +1,10 @@
 .DefaultCanvas {
-    background: gray;
+    background: #1e1e1e;
     overflow: hidden;
     /* display: flex; */
+}
+.Canvas-Animation {
+    background-color: #1e1e1e;
+    overflow: clip;
+    display: flex;
 }

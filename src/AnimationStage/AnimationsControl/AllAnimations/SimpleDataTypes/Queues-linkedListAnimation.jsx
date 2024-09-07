@@ -1,9 +1,7 @@
 import { useRef, useEffect, useState } from "react";
-import "./Queues-linkedListAnimation.css";
 import PropTypes from "prop-types";
 
 const QueueslinkedListAnimations = ({
-  speed,
   height,
   Queue,
   UnQueue,
@@ -260,7 +258,7 @@ const QueueslinkedListAnimations = ({
       drawTailandHead(canvas, context);
     }
   }, [height, windowWidth, menuWidth, queue]);
-  return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 export default QueueslinkedListAnimations;
 QueueslinkedListAnimations.prototype = {

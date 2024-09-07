@@ -30,8 +30,9 @@ const MergeSortAnimations = ({
   const maxInt = 99;
   const minInt = -99;
   const maxFrames = 70;
-  const normalColor = "grey";
-  const hilightedColor = "red";
+  const normalColor = "#484848";
+  const hilightedColor = "#800000";
+  const sortedColor = "#228B22";
   const spaceBetweenArrays = 70;
   const spaceBetweenArraysY = 40;
 
@@ -75,7 +76,7 @@ const MergeSortAnimations = ({
       if (this.display) {
         //draw the box
         context.fillStyle =
-          color == hilightedColor ? color : this.sorted ? "green" : color;
+          color == hilightedColor ? color : this.sorted ? sortedColor : color;
         context.fillRect(this.x, this.y, boxWidth, boxWidth);
         context.strokeStyle = "white"; // Use the boxColor prop
         context.strokeRect(this.x, this.y, boxWidth, boxWidth);
@@ -920,7 +921,7 @@ const MergeSortAnimations = ({
     }
   }, [height, windowWidth, menuWidth, arr, isAnimating, arrayStack]);
 
-  return <canvas className="StacksAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 export default MergeSortAnimations;
 MergeSortAnimations.prototype = {

@@ -22,7 +22,7 @@
 }
 
 .button {
-    background-color: #413f3f;
+    background-color: #1e1e1e;
     color: #d1cdcd;
     border: none;
     padding: 6px 16px;
@@ -34,7 +34,7 @@
     margin-right: 20px;
 }
 .button:hover {
-    background: #454545;
+    background: #222222;
 }
 
 .icon {

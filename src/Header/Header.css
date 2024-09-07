@@ -5,12 +5,12 @@ body {
 
 header {
     height: 30px;
-    background-color: #413f3f; /* #696969; change the background color as needed */
+   background-color: #1e1e1e; #413f3f /* #696969; change the background color as needed */
     color: white;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #232323; /* Add border for outline */
+    border-bottom: 1px solid black; /* Add border for outline */
 }
 
 .right-buttons {
@@ -19,7 +19,7 @@ header {
     margin-right: 10px;
 }
 .home-button {
-    background-color: #413f3f;
+    background-color: #1e1e1e; #413f3f
     color: #d1cdcd;
     border: none;
     padding: 0px 17px;
@@ -68,7 +68,7 @@ header {
     font-size: 13px; /* Adjust the font size as needed */
     height: 100%;
     margin-left: 20px;
-    background-color: #413f3f; /* You can change the background color as needed */
+    background-color: #1e1e1e; /* You can change the background color as needed */
     border: 1px #696969; /* Add border for outline */
     align-items: center;
     color: white;
@@ -87,12 +87,12 @@ header {
     padding-right: 15px;
     padding-left: 15px;
     width: 25px;
-    transform: scale(1.1);
+    transform: scale(1);
     overflow: auto;
     opacity: 0.7;
 }
 .gitIMG:hover {
-    transform: scale(1);
+    transform: scale(1.1);
     opacity: 1;
-    background: #454545;
+    //background: #1c1c1c;
 }

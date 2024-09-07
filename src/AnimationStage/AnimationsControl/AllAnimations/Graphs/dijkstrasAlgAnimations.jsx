@@ -28,8 +28,10 @@ const DijkstrasAlgAnimations = ({
   const [animationQueue, setAnimationQueue] = useState([]);
   const maxEdgeWeight = 50;
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
-  const normalColor = "gray";
-  const edgeNormColor = "white";
+  const normalColor = "#484848";
+  const sortedColor = "#228B22";
+  const edgeNormColor = "#A9A9A9";
+  const hilightedColor = "#800000";
 
   //the class that represents the vertex
   class Nodes {
@@ -45,7 +47,7 @@ const DijkstrasAlgAnimations = ({
       this.borderColor = "black";
     }
     SearchingThroughNode() {
-      this.borderColor = "red";
+      this.borderColor = hilightedColor;
     }
     UnSearchingThroughNode() {
       this.borderColor = "black";
@@ -57,7 +59,7 @@ const DijkstrasAlgAnimations = ({
       this.searched = false;
     }
     getColor() {
-      return this.searched ? "green" : normalColor;
+      return this.searched ? sortedColor : normalColor;
     }
     getShape() {
       if (this.type == "start") return "star";
@@ -129,7 +131,7 @@ const DijkstrasAlgAnimations = ({
     },
     Log: (str) => {
       if (str == "end") {
-        Log(`Path Found with the Length of ${graph[0][targetNode].label}!`);
+        Log(`Path Found with the cost of ${graph[0][targetNode].label}!`);
       } else {
         Log(str);
       }
@@ -411,24 +413,31 @@ const DijkstrasAlgAnimations = ({
         // Check each neighbor of the current node
         for (const neighbor of graph[1][currentNode]) {
           const node = get(graph[0], neighbor.data);
-          const { weight } = neighbor;
-          const newDistance = distances[currentNode] + weight;
+          if (node != rootNode) {
+            const { weight } = neighbor;
+            const newDistance = distances[currentNode] + weight;
 
-          //color the neighbor edge since the path is
-          animationQueue.push(["colorEdge", [currentNode, node], "red", true]);
-
-          // If a shorter path to the neighbor is found
-          if (newDistance < distances[node]) {
-            distances[node] = newDistance;
-
-            //set the nodes distnaces
+            //color the neighbor edge since the path is
             animationQueue.push([
-              "setNodeDistances",
-              deepCopyArrayOfObjects(distances),
+              "colorEdge",
+              [currentNode, node],
+              hilightedColor,
+              true,
             ]);
 
-            previous[node] = currentNode;
-            pq.enqueue(newDistance, node);
+            // If a shorter path to the neighbor is found
+            if (newDistance < distances[node]) {
+              distances[node] = newDistance;
+
+              //set the nodes distnaces
+              animationQueue.push([
+                "setNodeDistances",
+                deepCopyArrayOfObjects(distances),
+              ]);
+
+              previous[node] = currentNode;
+              pq.enqueue(newDistance, node);
+            }
           }
         }
         //clear the graph
@@ -488,7 +497,7 @@ const DijkstrasAlgAnimations = ({
         animationQueue.push([
           "colorEdge",
           edgeTraversalList[i - 1],
-          "green",
+          sortedColor,
           true,
         ]);
       }
@@ -678,6 +687,7 @@ const DijkstrasAlgAnimations = ({
           {
             selector: "node[label]",
             style: {
+              color: "white",
               "text-wrap": "wrap",
               "text-max-width": "60px",
               "text-valign": "top",
@@ -715,7 +725,7 @@ const DijkstrasAlgAnimations = ({
 
   return (
     <div
-      className="StacksAnimationCanvas"
+      className="Canvas-Animation"
       ref={canvasRef}
       style={{ width: windowWidth - menuWidth, height: height - 3 }}
     />

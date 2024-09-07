@@ -1,9 +1,7 @@
 import { useRef, useEffect, useState } from "react";
-import "./Stacks-linkedListAnimation.css";
 import PropTypes from "prop-types";
 
 const StackslinkedListAnimations = ({
-  speed,
   height,
   Push,
   Pop,
@@ -251,7 +249,7 @@ const StackslinkedListAnimations = ({
       drawTopBox(canvas, context);
     }
   }, [height, windowWidth, menuWidth, stack]);
-  return <canvas className="StackslinkedListAnimationCanvas" ref={canvasRef} />;
+  return <canvas className="Canvas-Animation" ref={canvasRef} />;
 };
 export default StackslinkedListAnimations;
 StackslinkedListAnimations.prototype = {

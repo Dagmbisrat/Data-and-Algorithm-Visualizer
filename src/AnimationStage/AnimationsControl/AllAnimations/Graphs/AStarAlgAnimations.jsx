@@ -28,8 +28,11 @@ const AStarAlgAniamtions = ({
   const [animationQueue, setAnimationQueue] = useState([]);
   const maxEdgeWeight = 50;
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
-  const normalColor = "gray";
-  const edgeNormColor = "white";
+  const normalColor = "#484848";
+  const sortedColor = "#228B22";
+  const edgeNormColor = "#A9A9A9";
+  const hilightedColor = "#800000";
+  hilightedColor;
 
   //the class that represents the vertex
   class Nodes {
@@ -46,7 +49,7 @@ const AStarAlgAniamtions = ({
       this.borderColor = "black";
     }
     SearchingThroughNode() {
-      this.borderColor = "red";
+      this.borderColor = hilightedColor;
     }
     UnSearchingThroughNode() {
       this.borderColor = "black";
@@ -58,7 +61,7 @@ const AStarAlgAniamtions = ({
       this.searched = false;
     }
     getColor() {
-      return this.searched ? "green" : normalColor;
+      return this.searched ? sortedColor : normalColor;
     }
     getShape() {
       if (this.type == "start") return "star";
@@ -402,33 +405,35 @@ const AStarAlgAniamtions = ({
         // Check each neighbor of the current node
         for (const neighbor of graph[1][current]) {
           const neighborNode = get(graph[0], neighbor.data);
-          const { weight } = neighbor;
-          const tentativeGScore = gScore[current] + weight;
+          if (neighborNode != rootNode) {
+            const { weight } = neighbor;
+            const tentativeGScore = gScore[current] + weight;
 
-          //color the neighbor edge since the path is
-          // await colorEdge([current, neighborNode], "red", true);
-          animationQueue.push([
-            "colorEdge",
-            [current, neighborNode],
-            "red",
-            true,
-          ]);
-
-          if (tentativeGScore < gScore[neighborNode]) {
-            cameFrom[neighborNode] = current;
-            gScore[neighborNode] = tentativeGScore;
-            fScore[neighborNode] =
-              gScore[neighborNode] + heuristic(neighborNode, goal);
-
-            //set the nodes distnaces
-            //await setNodeDistances(gScore, fScore);
+            //color the neighbor edge since the path is
+            // await colorEdge([current, neighborNode], hilightedColor, true);
             animationQueue.push([
-              "setNodeDistances",
-              deepCopyArrayOfObjects(gScore),
-              deepCopyArrayOfObjects(fScore),
+              "colorEdge",
+              [current, neighborNode],
+              hilightedColor,
+              true,
             ]);
 
-            openSet.enqueue(fScore[neighborNode], neighborNode);
+            if (tentativeGScore < gScore[neighborNode]) {
+              cameFrom[neighborNode] = current;
+              gScore[neighborNode] = tentativeGScore;
+              fScore[neighborNode] =
+                gScore[neighborNode] + heuristic(neighborNode, goal);
+
+              //set the nodes distnaces
+              //await setNodeDistances(gScore, fScore);
+              animationQueue.push([
+                "setNodeDistances",
+                deepCopyArrayOfObjects(gScore),
+                deepCopyArrayOfObjects(fScore),
+              ]);
+
+              openSet.enqueue(fScore[neighborNode], neighborNode);
+            }
           }
         }
         //clear the graph
@@ -463,7 +468,7 @@ const AStarAlgAniamtions = ({
         animationQueue.push([
           "colorEdge",
           edgeTraversalList[i - 1],
-          "green",
+          sortedColor,
           true,
         ]);
       }
@@ -661,6 +666,7 @@ const AStarAlgAniamtions = ({
           {
             selector: 'node[Heuristic = "" ]',
             style: {
+              color: "white",
               "text-wrap": "wrap",
               "text-max-width": "60px",
               "text-valign": "top",
@@ -678,6 +684,7 @@ const AStarAlgAniamtions = ({
           {
             selector: 'node[Heuristic != "" ]',
             style: {
+              color: "white",
               "text-wrap": "wrap",
               "text-max-width": "60px",
               "text-valign": "top",
@@ -721,24 +728,11 @@ const AStarAlgAniamtions = ({
   }, [height, windowWidth, menuWidth, graph, isAnimating]);
 
   return (
-    <>
-      <div
-        className="StacksAnimationCanvas"
-        ref={canvasRef}
-        style={{
-          width: windowWidth - menuWidth,
-          height: height - 22,
-        }}
-      />
-      <div
-        style={{
-          fontSize: "10px",
-        }}
-      >
-        *The Heuristic function (the number at the bottom of a vertex)
-        represents distance to the target node (the Hexagon)
-      </div>
-    </>
+    <div
+      className="Canvas-Animation"
+      ref={canvasRef}
+      style={{ width: windowWidth - menuWidth, height: height - 3 }}
+    />
   );
 };
 export default AStarAlgAniamtions;

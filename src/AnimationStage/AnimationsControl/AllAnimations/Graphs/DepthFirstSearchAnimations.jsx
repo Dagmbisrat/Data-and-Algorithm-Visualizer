@@ -27,8 +27,9 @@ const DepthFirstSearchAnimations = ({
   ]);
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*";
   const rootShape = "star";
-  const normalColor = "gray";
-  const edgeNormColor = "white";
+  const normalColor = "#484848";
+  const sortedColor = "#228B22";
+  const edgeNormColor = "#A9A9A9";
 
   //the class that represents the vertex
   class Nodes {
@@ -48,7 +49,7 @@ const DepthFirstSearchAnimations = ({
       this.searched = false;
     }
     getColor() {
-      return this.searched ? "green" : normalColor;
+      return this.searched ? sortedColor : normalColor;
     }
   }
 
@@ -68,7 +69,7 @@ const DepthFirstSearchAnimations = ({
       return this.data;
     }
     getColor() {
-      return this.searched ? "green" : edgeNormColor;
+      return this.searched ? sortedColor : edgeNormColor;
     }
   }
 
@@ -453,6 +454,7 @@ const DepthFirstSearchAnimations = ({
               width: "35",
               height: "35",
               label: "data(id)",
+              color: "white",
               "border-color": "black", // white outline
               "border-width": "1px", // thickness of the outline
               "border-style": "solid", // style of the outline
@@ -494,7 +496,7 @@ const DepthFirstSearchAnimations = ({
 
   return (
     <div
-      className="StacksAnimationCanvas"
+      className="Canvas-Animation"
       ref={canvasRef}
       style={{ width: windowWidth - menuWidth, height: height - 3 }}
     />
